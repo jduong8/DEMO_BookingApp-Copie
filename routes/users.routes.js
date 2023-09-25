@@ -6,7 +6,10 @@ var router = express.Router();
 router.get('/users', userController.findAll);
 
 // POST data
-router.post('/users', userController.create);
+router.post('/signup', userController.create);
+
+// Get Token from POST request
+router.post('/signin', userController.connect);
 
 // PUT data
 router.put('/users/:id', userController.update);
