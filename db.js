@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-const sequelize = new Sequelize('postgres://postgres:0123456789@127.0.0.1:5432/postgres')
+const sequelize = new Sequelize('postgres://postgres:0123456789@127.0.0.1:5432/db_development')
 
 const db = {};
 
