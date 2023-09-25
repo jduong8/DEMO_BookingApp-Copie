@@ -1,9 +1,11 @@
 require('dotenv').config();
 const reservationController = require('../controllers/reservation.controller.js');
 // Importation des modules nécessaires
-var express = require('express');
+const express = require('express');
+const jwt = require('jsonwebtoken');
 var router = express.Router();
 const SECRET_KEY = process.env.SECRET_KEY;
+
 
 
 const verifyJWT = (req, res, next) => {
