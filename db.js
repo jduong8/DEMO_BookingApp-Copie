@@ -1,6 +1,9 @@
-const { Sequelize } = require('sequelize');
-const sequelize = new Sequelize('postgres://postgres:0123456789@127.0.0.1:5432/db_development')
+require('dotenv').config();
+const userDefault = process.env.DB_USERDEFAULT;
+const dbPassword = process.env.DB_PASSWORD;
 
+const { Sequelize } = require('sequelize');
+const sequelize = new Sequelize(`postgres://${userDefault}:${dbPassword}@tai.db.elephantsql.com/${userDefault}`);
 const db = {};
 
 // Importer les modèles
