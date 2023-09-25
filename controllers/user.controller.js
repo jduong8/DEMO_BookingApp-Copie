@@ -6,20 +6,6 @@ const bcrypt = require('bcrypt');
 const SECRET_KEY = process.env.SECRET_KEY;
 const { use } = require('../app.js');
 
-const verifyJWT = (req, res, next) => {
-    const token = req.header('Authorization');
-
-    if (!token) return res.status(401).json({ auth: false, message: 'Veuillez ajouter un token' });
-
-    try {
-        const decoded = jwt.verify(token, SECRET_KEY);
-        req.user = decoded;
-        next();
-    } catch (e) {
-        res.status(400).json({ auth: false, message: 'Token inccorect.' });
-    }
-};
-
 exports.findAll = (req, res) => {
     User.findAll().then(users => {
         res.send(users)
