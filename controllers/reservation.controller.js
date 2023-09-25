@@ -15,18 +15,18 @@ exports.create = (req, res) => {
         reservation_note
     } = req.body;
 
-    if (typeof number_of_customers !== 'number') {
-        return res.status(422).json({ error: "Must be a number" });
-    }
-    if (typeof reservation_date !== 'string') {
-        return res.status(422).json({ error: "Must be a string" });
-    }
-    if (typeof reservation_name !== 'string') {
-        return res.status(422).json({ error: "Must be a string" });
-    }
-    if (typeof reservation_note !== 'string') {
-        return res.status(422).json({ error: "Must be a string" });
-    }
+    const validations = {
+        number_of_customers: 'number',
+        reservation_date: 'string',
+        reservation_name: 'string',
+        reservation_note: 'string',
+    };
+
+    for (const [key, type] of Object.entries(validations)) {
+        if (typeof req.body[key] !== type) {
+            return res.status(422).json({ error: `${key} must be a ${type}` });
+        }
+    };
 
     Reservation.create({
         number_of_customers: number_of_customers,
