@@ -4,7 +4,6 @@ const User = db.user;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const SECRET_KEY = process.env.SECRET_KEY;
-// const { use } = require('../app.js');
 
 exports.findAll = (req, res) => {
     User.findAll().then(users => {
