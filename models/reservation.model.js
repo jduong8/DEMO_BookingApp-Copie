@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
-module.exports = (sequelise) => {
-    const Reservation = sequelise.define('Reservation', {
+module.exports = (sequelize) => {
+    const Reservation = sequelize.define('Reservation', {
         number_of_customers: {
             type: DataTypes.INTEGER,
             allowNull: false
