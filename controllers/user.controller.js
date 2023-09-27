@@ -84,6 +84,25 @@ exports.create = async (req, res) => {
         // Hashage du mot de passe
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(user_password, salt);
+        const validations = {
+            firstname: 'string',
+            lastname: 'string',
+            email: 'email',
+            phone: 'string',
+            user_password: 'string'
+        };
+        
+        for (const [key, type] of Object.entries(validations)) {
+            if (type === 'email') {
+                // Utilisation d'une expression régulière pour la validation de l'email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(req.body[key])) {
+                    return res.status(422).json({ error: `Invalid email format` });
+                }
+            } else if (typeof req.body[key] !== type) {
+                return res.status(422).json({ error: `${key} must be a ${type}` });
+            }
+        }
 
         // Création de l'utilisateur
         const user = await User.create({
