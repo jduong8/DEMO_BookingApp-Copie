@@ -60,8 +60,27 @@ exports.create = (req, res) => {
 };
 
 
-exports.update = (req, res) => {
-    const reservationId = req.params.id
+exports.update = async (req, res) => {
+    const reservationId = req.params.id;
+
+    // Trouver la réservation dans la base de données
+    const reservation = await Reservation.findByPk(reservationId);
+
+    // Si la réservation n'existe pas, renvoyer une erreur
+    if (!reservation) {
+        return res.status(404).send({
+            message: `Reservation not found with id: ${reservationId}`
+        });
+    }
+
+    // Vérifier que l'utilisateur actuellement connecté est l'auteur de la réservation
+    if (reservation.userId !== req.user.id) {
+        return res.status(403).send({
+            message: "User not authorized to update this reservation"
+        });
+    }
+
+    // Mettre à jour la réservation
     Reservation.update({
         number_of_customers: req.body.number_of_customers,
         reservation_date: req.body.reservation_date,
@@ -76,11 +95,36 @@ exports.update = (req, res) => {
         res.status(200).send({
             message: `Reservation updated for reservationID: ${reservationId}`
         });
+    }).catch(error => {
+        console.error(error);
+        res.status(500).send("Server error");
     });
 };
 
-exports.delete = (req, res) => {
-    const reservationId = req.params.id
+
+exports.delete = async (req, res) => {
+    const reservationId = req.params.id;
+
+    // Trouver la réservation dans la base de données
+    const reservation = await Reservation.findByPk(reservationId);
+
+    // Si la réservation n'existe pas, on renvoie une erreur
+    if (!reservation) {
+        return res.status(404).send({
+            message: `Reservation not found with id: ${reservationId}`
+        });
+    }
+
+    // Vérifier que l'utilisateur actuellement connecté est l'auteur de la réservation,
+    // ou qu'il a le rôle d'admin ou de super_admin
+    const userRole = req.user.user_role;
+    if (reservation.userId !== req.user.id && userRole !== 'admin' && userRole !== 'super_admin') {
+        return res.status(403).send({
+            message: "User not authorized to delete this reservation"
+        });
+    }
+
+    // Supprimer la réservation
     Reservation.destroy({
         where: {
             id: reservationId
@@ -89,5 +133,8 @@ exports.delete = (req, res) => {
         res.status(200).send({
             message: `Reservation deleted for reservationID: ${reservationId}`
         });
+    }).catch(error => {
+        console.error(error);
+        res.status(500).send("Server error");
     });
 };
