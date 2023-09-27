@@ -5,7 +5,7 @@ const express = require('express');
 const router = express.Router();
 
 // GET home page
-router.get('/reservations', reservationController.findAll);
+router.get('/reservations/all', verifyJWT, reservationController.findAll);
 
 // POST data
 router.post('/reservations', verifyJWT, reservationController.create);

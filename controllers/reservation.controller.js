@@ -1,13 +1,32 @@
 const db = require('../db.js')
 const Reservation = db.reservation;
 
-exports.findAll = (req, res) => {
-    Reservation.findAll().then(reservations => {
-        res.send(reservations)
-    })
-}
+exports.findAll = async (req, res) => {
+    try {
+        let reservations;
+
+        // Si l'utilisateur est un admin ou un super_admin, récupérer toutes les réservations
+        if (req.user.user_role === 'admin' || req.user.user_role === 'super_admin') {
+            reservations = await Reservation.findAll();
+        } else {
+            // Sinon, récupérer uniquement les réservations créées par l'utilisateur actuel
+            reservations = await Reservation.findAll({
+                where: {
+                    userId: req.user.id
+                }
+            });
+        }
+
+        res.send(reservations);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Server error");
+    }
+};
+
 
 exports.create = (req, res) => {
+    console.log('Req User:', req.user.id);
     const {
         number_of_customers,
         reservation_date,
@@ -34,9 +53,10 @@ exports.create = (req, res) => {
         reservation_name: reservation_name,
         reservation_note: reservation_note,
         reservation_status: 1,
-    }).then(reservation => {
+        userId: req.user.id, // supposant que l'utilisateur actuel est stocké dans req.user
+     }).then(reservation => {
         res.send(reservation)
-    });
+     });
 };
 
 
