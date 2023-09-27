@@ -1,26 +1,30 @@
 require('dotenv').config();
-const userDefault = process.env.DB_USERDEFAULT;
-const dbPassword = process.env.DB_PASSWORD;
+const config = require('./config/config');
+
+const environment = process.env.NODE_ENV || 'development';
+const dbConfig = config[environment];
 
 const { Sequelize } = require('sequelize');
-// const sequelize = new Sequelize('postgres://postgres:0123456789@127.0.0.1:5432/db_development')
-const sequelize = new Sequelize(`postgres://${userDefault}:${dbPassword}@tai.db.elephantsql.com/${userDefault}`);
+const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
+  host: dbConfig.host,
+  dialect: dbConfig.dialect
+});
 const db = {};
 
-// Importer les modèles
+// Importation les modèles
 db.user = require('./models/user.model.js')(sequelize);
 db.spot = require('./models/spot.model.js')(sequelize);
 db.room = require('./models/room.model.js')(sequelize);
 db.reservation = require('./models/reservation.model.js')(sequelize);
 
 // Synchronisation avec la base de données
-sequelize.sync({ force: true })
-  .then(() => {
-    console.log("Les tables ont été créées !");
-  })
-  .catch((error) => {
-    console.error("Erreur lors de la création des tables :", error);
-  });
+// sequelize.sync({ force: true })
+//   .then(() => {
+//     console.log("Les tables ont été créées !");
+//   })
+//   .catch((error) => {
+//     console.error("Erreur lors de la création des tables :", error);
+//   });
 
 // try {
 //   sequelize.authenticate().then(() => {

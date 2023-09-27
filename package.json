@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node --watch ./bin/www",
-    "test": "jest"
+    "test": "NODE_ENV=test jest"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
