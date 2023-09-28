@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node --watch ./bin/www",
-    "test": "NODE_ENV=test jest"
+    "test": "NODE_ENV=test jest",
+    "seed": "npx sequelize-cli db:seed:all --env test"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
