@@ -6,6 +6,9 @@ var router = express.Router();
 // GET Users List
 router.get('/users', userController.findAll);
 
+// GET Users Infor
+router.get('/user/me', verifyJWT, userController.getUserInfo);
+
 // POST data
 router.post('/signup', userController.create);
 

@@ -5,12 +5,39 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const SECRET_KEY = process.env.SECRET_KEY;
 
+/* GET */
 exports.findAll = (req, res) => {
     User.findAll().then(users => {
         res.send(users)
     })
 }
+exports.getUserInfo = async (req, res) => {
+    try {
+        // Récupérer l'ID utilisateur du token JWT
+        const userId = req.user.id;
+        
+        // Trouver l'utilisateur dans la base de données à l'aide de l'ID
+        const user = await User.findByPk(userId);
+        
+        // Si l'utilisateur n'existe pas, on renvoie une erreur 404
+        if (!user) return res.status(404).json({ message: "User not found" });
+        
+        // Sinon, on renvoie les informations de l'utilisateur (sans le mot de passe)
+        res.status(200).json({
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            phone: user.phone,
+            user_role: user.user_role,
+        });
+        
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 
+/* POST */
 exports.addSuperAdmin = async (req, res) => {
     try {
         // Valider les données reçues
@@ -60,7 +87,6 @@ exports.addSuperAdmin = async (req, res) => {
         res.status(500).json({ message: "Erreur lors de la création du superAdmin" });
     }
 };
-
 exports.create = async (req, res) => {
     try {
         // Validation des données entrantes
@@ -68,19 +94,15 @@ exports.create = async (req, res) => {
         if (!firstname || !lastname || !email || !phone || !user_password) {
             return res.status(400).json({ message: "All fields are required" });
         }
-
         // Vérification du rôle de l'utilisateur actuel s'il souhaite assigner un rôle spécifique
         if (user_role) {
             const currentUserRole = req.user ? req.user.role : 'client'; // Supposons que vous ayez le rôle de l'utilisateur actuel dans req.user
-
             if (user_role === 'admin' && currentUserRole !== 'super_admin') {
                 return res.status(403).json({ message: "Only a Super Admin can assign the Admin role" });
             }
         }
-
         // Si un rôle n'est pas spécifié ou si l'utilisateur n'a pas les droits pour assigner un rôle, assigner le rôle 'client' par défaut
         const assignedRole = user_role && currentUserRole === 'super_admin' ? user_role : 'client';
-
         // Hashage du mot de passe
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(user_password, salt);
@@ -103,7 +125,6 @@ exports.create = async (req, res) => {
                 return res.status(422).json({ error: `${key} must be a ${type}` });
             }
         }
-
         // Création de l'utilisateur
         const user = await User.create({
             firstname,
@@ -113,7 +134,6 @@ exports.create = async (req, res) => {
             user_password: hashedPassword,
             user_role: assignedRole,
         });
-
         // Renvoyer l'utilisateur créé (sans le mot de passe)
         res.status(200).json({
             message: "User created",
@@ -126,25 +146,20 @@ exports.create = async (req, res) => {
                 user_role: user.user_role,
             }
         });
-
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error creating user" });
     }
 };
 
-
-
 exports.connect = async (req, res) => {
     try {
         const user = await User.findOne({ where: { email: req.body.email } });
-
         if (!user) {
             return res.status(400).send("Incorrect user or password");
         }
 
         const validPassword = await bcrypt.compare(req.body.user_password, user.user_password);
-        
         if (!validPassword) {
             return res.status(400).send("Incorrect user or password");
         }
@@ -154,20 +169,18 @@ exports.connect = async (req, res) => {
             email: user.email,
             user_role: user.user_role
         }
-
         const token = jwt.sign(payload, SECRET_KEY, { expiresIn: 60 * 60 * 24 });
         res.json({ 
             message: "Connexion succeed",
             token: token
         });
-
     } catch (error) {
         console.error(error);
         res.status(500).send("Server error");
     }
 };
 
-
+/* PUT */
 exports.update = async (req, res) => {
     const userId = parseInt(req.params.id, 10);
     const currentUser = req.user;
@@ -176,7 +189,7 @@ exports.update = async (req, res) => {
     if (!currentUser) {
         return res.status(401).json({ message: "Unauthorized" });
     }
-    
+
     const userToUpdate = await User.findByPk(userId);
     if (!userToUpdate) return res.status(404).json({ message: "User not found" });
 
@@ -209,7 +222,7 @@ exports.update = async (req, res) => {
     });
 };
 
-
+/* DELETE */
 exports.delete = async (req, res) => {
     const userId = req.params.id;
     const currentUser = req.user;
