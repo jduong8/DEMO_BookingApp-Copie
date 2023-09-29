@@ -12,6 +12,9 @@ router.get('/user/me', verifyJWT, userController.getUserInfo);
 // POST data
 router.post('/signup', userController.create);
 
+// POST to Update password
+router.post('/user/me/update-password', verifyJWT, userController.updatePassword);
+
 // Add Super Admin
 router.post('/superAdmin', userController.addSuperAdmin);
 
