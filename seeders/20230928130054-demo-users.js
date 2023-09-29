@@ -18,7 +18,7 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date()
       },
-      // ... Autres utilisateurs
+      // On ajoute d'autres utilisateurs si nécessaire...
     ], {});
   },
 

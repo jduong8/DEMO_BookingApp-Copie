@@ -18,13 +18,13 @@ db.room = require('./models/room.model.js')(sequelize);
 db.reservation = require('./models/reservation.model.js')(sequelize);
 
 // Synchronisation avec la base de données
-sequelize.sync({ force: true })
-  .then(() => {
-    console.log("Les tables ont été créées !");
-  })
-  .catch((error) => {
-    console.error("Erreur lors de la création des tables :", error);
-  });
+// sequelize.sync({ force: true })
+//   .then(() => {
+//     console.log("Les tables ont été créées !");
+//   })
+//   .catch((error) => {
+//     console.error("Erreur lors de la création des tables :", error);
+//   });
 
 // try {
 //   sequelize.authenticate().then(() => {
