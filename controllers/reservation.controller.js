@@ -1,12 +1,14 @@
 const db = require('../db.js')
 const Reservation = db.reservation;
+const ADMIN = 'admin';
+const SUPER_ADMIN = 'super_admin';
 
-exports.findAll = async (req, res) => {
+exports.findAll = async (req, res, next) => {
     try {
         let reservations;
 
         // Si l'utilisateur est un admin ou un super_admin, récupérer toutes les réservations
-        if (req.user.user_role === 'admin' || req.user.user_role === 'super_admin') {
+        if (req.user.user_role === ADMIN || req.user.user_role === SUPER_ADMIN) {
             reservations = await Reservation.findAll();
         } else {
             // Sinon, récupérer uniquement les réservations créées par l'utilisateur actuel
@@ -19,13 +21,13 @@ exports.findAll = async (req, res) => {
 
         res.send(reservations);
     } catch (error) {
-        console.error(error);
-        res.status(500).send("Server error");
+        next(error);
     }
 };
 
 
-exports.create = (req, res) => {
+exports.create = async (req, res, next) => {
+    try {
     console.log('Req User:', req.user.id);
     const {
         number_of_customers,
@@ -47,20 +49,23 @@ exports.create = (req, res) => {
         }
     };
 
-    Reservation.create({
+    const reservation = await Reservation.create({
         number_of_customers: number_of_customers,
         reservation_date: reservation_date,
         reservation_name: reservation_name,
         reservation_note: reservation_note,
         reservation_status: 1,
         userId: req.user.id, // supposant que l'utilisateur actuel est stocké dans req.user
-     }).then(reservation => {
+     })
         res.send(reservation)
-     });
+    } catch (error) {
+        next(error);
+
+    }
 };
 
 
-exports.update = async (req, res) => {
+exports.update = async (req, res, next) => {
     const reservationId = req.params.id;
 
     // Trouver la réservation dans la base de données
@@ -69,19 +74,20 @@ exports.update = async (req, res) => {
     // Si la réservation n'existe pas, renvoyer une erreur
     if (!reservation) {
         return res.status(404).send({
-            message: `Reservation not found with id: ${reservationId}`
+            error: `Reservation not found with id: ${reservationId}`
         });
     }
 
     // Vérifier que l'utilisateur actuellement connecté est l'auteur de la réservation
     if (reservation.userId !== req.user.id) {
         return res.status(403).send({
-            message: "User not authorized to update this reservation"
+            error: "User not authorized to update this reservation"
         });
     }
 
+    try {
     // Mettre à jour la réservation
-    Reservation.update({
+    await Reservation.update({
         number_of_customers: req.body.number_of_customers,
         reservation_date: req.body.reservation_date,
         reservation_name: req.body.reservation_name,
@@ -91,18 +97,15 @@ exports.update = async (req, res) => {
         where: {
             id: reservationId
         }
-    }).then(() => {
-        res.status(200).send({
-            message: `Reservation updated for reservationID: ${reservationId}`
-        });
-    }).catch(error => {
-        console.error(error);
-        res.status(500).send("Server error");
-    });
+    })
+    res.status(200).send({ message: `Reservation updated for reservationID: ${reservationId}` });
+    } catch(error) {
+        next(error);
+    };
 };
 
 
-exports.delete = async (req, res) => {
+exports.delete = async (req, res, next) => {
     const reservationId = req.params.id;
 
     // Trouver la réservation dans la base de données
@@ -118,23 +121,20 @@ exports.delete = async (req, res) => {
     // Vérifier que l'utilisateur actuellement connecté est l'auteur de la réservation,
     // ou qu'il a le rôle d'admin ou de super_admin
     const userRole = req.user.user_role;
-    if (reservation.userId !== req.user.id && userRole !== 'admin' && userRole !== 'super_admin') {
+    if (reservation.userId !== req.user.id && userRole !== ADMIN && userRole !== SUPER_ADMIN) {
         return res.status(403).send({
             message: "User not authorized to delete this reservation"
         });
     }
-
+    try {
     // Supprimer la réservation
     Reservation.destroy({
-        where: {
-            id: reservationId
-        }
-    }).then(() => {
+        where: { id: reservationId }
+    })
         res.status(200).send({
             message: `Reservation deleted for reservationID: ${reservationId}`
         });
-    }).catch(error => {
-        console.error(error);
-        res.status(500).send("Server error");
-    });
+    } catch(error) {
+        next(error);
+    };
 };

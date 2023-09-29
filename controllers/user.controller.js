@@ -4,6 +4,7 @@ const User = db.user;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const SECRET_KEY = process.env.SECRET_KEY;
+const validator = require('validator');
 
 /* GET */
 exports.findAll = (req, res) => {
@@ -11,7 +12,7 @@ exports.findAll = (req, res) => {
         res.send(users)
     })
 }
-exports.getUserInfo = async (req, res) => {
+exports.getUserInfo = async (req, res, next) => {
     try {
         // Récupérer l'ID utilisateur du token JWT
         const userId = req.user.id;
@@ -32,8 +33,7 @@ exports.getUserInfo = async (req, res) => {
         });
         
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+        next(error);
     }
 };
 
@@ -115,12 +115,8 @@ exports.create = async (req, res) => {
         };
         
         for (const [key, type] of Object.entries(validations)) {
-            if (type === 'email') {
-                // Utilisation d'une expression régulière pour la validation de l'email
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(req.body[key])) {
-                    return res.status(422).json({ error: `Invalid email format` });
-                }
+            if (!validator.isEmail(req.body.email)) {
+                return res.status(400).json({ message: "Email invalide" });
             } else if (typeof req.body[key] !== type) {
                 return res.status(422).json({ error: `${key} must be a ${type}` });
             }
@@ -135,7 +131,7 @@ exports.create = async (req, res) => {
             user_role: assignedRole,
         });
         // Renvoyer l'utilisateur créé (sans le mot de passe)
-        res.status(200).json({
+        res.status(201).json({
             message: "User created",
             user: {
                 id: user.id,
@@ -152,7 +148,7 @@ exports.create = async (req, res) => {
     }
 };
 
-exports.connect = async (req, res) => {
+exports.connect = async (req, res, next) => {
     try {
         const user = await User.findOne({ where: { email: req.body.email } });
         if (!user) {
@@ -175,8 +171,7 @@ exports.connect = async (req, res) => {
             token: token
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).send("Server error");
+        next(error);
     }
 };
 

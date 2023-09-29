@@ -9,7 +9,7 @@ const verifyJWT = (req, res, next) => {
         const decoded = jwt.verify(token, SECRET_KEY);
         req.user = decoded;
         next();
-    } catch (e) {
+    } catch (error) {
         res.status(400).json({ auth: false, message: 'Incorrect token.' });
     }
 };
