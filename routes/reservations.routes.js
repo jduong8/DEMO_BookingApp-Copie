@@ -1,6 +1,6 @@
 require('dotenv').config();
 const reservationController = require('../controllers/reservation.controller.js');
-const verifyJWT = require('../middlewares/jwtMiddleware');
+const verifyJWT = require('../middlewares/jwt.middleware');
 const express = require('express');
 const router = express.Router();
 
