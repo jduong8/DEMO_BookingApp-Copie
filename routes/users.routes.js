@@ -4,7 +4,7 @@ var express = require('express');
 var router = express.Router();
 
 // GET Users List
-router.get('/users', userController.findAll);
+router.get('/users', verifyJWT, userController.findAll);
 
 // GET Users Infor
 router.get('/user/me', verifyJWT, userController.getUserInfo);
