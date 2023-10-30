@@ -15,20 +15,21 @@ describe('User Controller', () => {
       email: "john.doe@example.com",
       phone: "1234567890",
       user_password: "password",
-      // user_role: "client"
     };
     
     const response = await request(app)
       .post('/api/signup')
       .send(newUser);
       
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(201);
     expect(response.body.user.email).toBe(newUser.email);
  
     const user = await User.findOne({ where: { email: newUser.email } });
     expect(user).not.toBeNull();
-  });
+  });  
+});
 
+describe('Invalid Email address', () => {
   test('should not create a new user with invalid email', async () => {
     const invalidUser = {
       firstname: "John",
@@ -36,18 +37,16 @@ describe('User Controller', () => {
       email: "invalid-email", // Invalid email address
       phone: "1234567890",
       user_password: "password",
-      // user_role: "client"
     };
   
     const response = await request(app)
       .post('/api/signup')
       .send(invalidUser);
   
-    expect(response.statusCode).toBe(422);
+    expect(response.statusCode).toBe(400);
   
     // Vérifie que l'utilisateur n'a pas été créé
     const user = await User.findOne({ where: { email: invalidUser.email } });
     expect(user).toBeNull();
   });
-  
-});
+})

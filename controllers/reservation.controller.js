@@ -7,7 +7,7 @@ exports.findAll = async (req, res, next) => {
     try {
         let reservations;
 
-        // Si l'utilisateur est un admin ou un super_admin, récupérer toutes les réservations
+        // Si l'utilisateur est un admin ou un super_admin: récupérer toutes les réservations
         if (req.user.user_role === ADMIN || req.user.user_role === SUPER_ADMIN) {
             reservations = await Reservation.findAll();
         } else {
