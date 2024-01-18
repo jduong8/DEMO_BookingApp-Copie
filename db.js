@@ -1,24 +1,30 @@
-require('dotenv').config();
-const config = require('./config/config');
+require("dotenv").config();
+const config = require("./config/config");
 
-const environment = process.env.NODE_ENV || 'development';
+const environment = process.env.NODE_ENV || "development";
 const dbConfig = config[environment];
 
-const { Sequelize } = require('sequelize');
-const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
-  host: dbConfig.host,
-  dialect: dbConfig.dialect
-});
+const { Sequelize } = require("sequelize");
+const sequelize = new Sequelize(
+  dbConfig.database,
+  dbConfig.username,
+  dbConfig.password,
+  {
+    host: dbConfig.host,
+    dialect: dbConfig.dialect,
+  },
+);
 const db = {};
 
 // Importation les modèles
-db.user = require('./models/user.model.js')(sequelize);
-db.spot = require('./models/spot.model.js')(sequelize);
-db.room = require('./models/room.model.js')(sequelize);
-db.reservation = require('./models/reservation.model.js')(sequelize);
+db.user = require("./models/user.model.js")(sequelize);
+db.spot = require("./models/spot.model.js")(sequelize);
+db.room = require("./models/room.model.js")(sequelize);
+db.reservation = require("./models/reservation.model.js")(sequelize);
 
 // Synchronisation avec la base de données
-sequelize.sync({ force: true })
+sequelize
+  .sync({ force: true })
   .then(() => {
     console.log("Les tables ont été créées !");
   })
