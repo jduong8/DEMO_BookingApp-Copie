@@ -1,15 +1,42 @@
 require("dotenv").config();
+const { Op } = require("sequelize");
 const db = require("../db.js");
 const User = db.user;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const SECRET_KEY = process.env.SECRET_KEY;
+const USER_ROLE = require("../models/userRole.model.js");
 
 /* GET */
 exports.findAll = (req, res) => {
-  User.findAll().then((users) => {
-    res.send(users);
-  });
+  let whereCondition = {};
+
+  // Liste des attributs à exclure dans la réponse
+  const attributesToExclude = ["user_password"];
+
+  // Si l'utilisateur est un Admin, récupérer uniquement les utilisateurs avec le rôle Client
+  if (req.user.user_role === USER_ROLE.ADMIN) {
+    whereCondition.user_role = USER_ROLE.CLIENT;
+  }
+  // Si l'utilisateur est un Super_admin, récupérer les utilisateurs avec les rôles Admin et Client
+  else if (req.user.user_role === USER_ROLE.MASTER) {
+    whereCondition.user_role = { [Op.in]: [USER_ROLE.ADMIN, USER_ROLE.CLIENT] };
+    // Exclure également les informations du Super_Admin lui-même
+    whereCondition.id = { [Op.ne]: req.user.id };
+  }
+
+  User.findAll({
+    where: whereCondition,
+    attributes: { exclude: attributesToExclude },
+  })
+    .then((users) => {
+      res.send(users);
+    })
+    .catch((error) => {
+      res.status(500).send({
+        message: error.message || "Some error occurred while retrieving users.",
+      });
+    });
 };
 
 exports.getUserInfo = async (req, res, next) => {
@@ -51,7 +78,7 @@ exports.addSuperAdmin = async (req, res) => {
 
     // Création du super_admin
     const superAdmin = await User.create({
-      user_role: "super_admin", // Définir le rôle à super_admin
+      user_role: USER_ROLE.MASTER,
       firstname,
       lastname,
       email,
@@ -69,7 +96,7 @@ exports.addSuperAdmin = async (req, res) => {
 
     // Renvoyer le super_admin créé (sans le mot de passe) et le token
     res.status(200).json({
-      message: "SuperAdmin créé",
+      message: "Super Admin créé",
       user: {
         id: superAdmin.id,
         firstname: superAdmin.firstname,
