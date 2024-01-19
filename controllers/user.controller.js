@@ -1,15 +1,17 @@
-const config = require("dotenv").config();
+require("dotenv").config();
 const db = require("../db.js");
 const User = db.user;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const SECRET_KEY = config.process.env.SECRET_KEY;
+const SECRET_KEY = process.env.SECRET_KEY;
+
 /* GET */
 exports.findAll = (req, res) => {
   User.findAll().then((users) => {
     res.send(users);
   });
 };
+
 exports.getUserInfo = async (req, res, next) => {
   try {
     // Récupérer l'ID utilisateur du token JWT

@@ -1,11 +1,11 @@
-const config = require("dotenv").config();
+require("dotenv").config();
 const db = require("../db.js");
 const User = db.user;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const SECRET_KEY = config.process.env.SECRET_KEY;
-const HOTMAIL_ADDRESS = config.process.env.HOTMAIL_ADDRESS;
-const HOTMAIL_PASSWORD = config.process.env.HOTMAIL_PASSWORD;
+const SECRET_KEY = process.env.SECRET_KEY;
+const HOTMAIL_ADDRESS = process.env.HOTMAIL_ADDRESS;
+const HOTMAIL_PASSWORD = process.env.HOTMAIL_PASSWORD;
 const validator = require("validator");
 const nodemailer = require("nodemailer");
 
