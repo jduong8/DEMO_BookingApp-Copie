@@ -24,7 +24,7 @@ db.reservation = require("./models/reservation.model.js")(sequelize);
 
 // Synchronisation avec la base de données
 sequelize
-  .sync({ force: true })
+  .sync({ force: false })
   .then(() => {
     console.log("Les tables ont été créées !");
   })
