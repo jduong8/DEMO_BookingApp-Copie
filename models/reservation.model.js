@@ -1,4 +1,5 @@
 const { DataTypes } = require("sequelize");
+const RESERVATION_STATUS = require("./reservationStatus.model.js");
 
 module.exports = (sequelize) => {
   const Reservation = sequelize.define(
@@ -9,7 +10,11 @@ module.exports = (sequelize) => {
         allowNull: false,
       },
       reservation_date: {
-        type: DataTypes.STRING,
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+      },
+      reservation_time: {
+        type: DataTypes.TIME,
         allowNull: false,
       },
       reservation_name: {
@@ -21,7 +26,12 @@ module.exports = (sequelize) => {
         allowNull: true,
       },
       reservation_status: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.ENUM,
+        values: [
+          RESERVATION_STATUS.PENDING,
+          RESERVATION_STATUS.CONFIRMED,
+          RESERVATION_STATUS.CANCELLATION_REQUESTED,
+        ],
         allowNull: false,
       },
       userId: {
