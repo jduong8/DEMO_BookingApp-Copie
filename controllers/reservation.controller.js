@@ -1,7 +1,7 @@
 const db = require("../db.js");
 const Reservation = db.reservation;
-const ADMIN = "admin";
-const SUPER_ADMIN = "super_admin";
+const ADMIN = "Admin";
+const SUPER_ADMIN = "Super_admin";
 
 exports.findAll = async (req, res, next) => {
   try {
@@ -98,11 +98,9 @@ exports.update = async (req, res, next) => {
         },
       },
     );
-    res
-      .status(200)
-      .send({
-        message: `Reservation updated for reservationID: ${reservationId}`,
-      });
+    res.status(200).send({
+      message: `Reservation updated for reservationID: ${reservationId}`,
+    });
   } catch (error) {
     next(error);
   }

@@ -5,7 +5,9 @@
   "scripts": {
     "start": "node --watch ./bin/www",
     "test": "NODE_ENV=test jest",
-    "seed": "npx sequelize-cli db:seed:all --env test",
+    "seedall": "npx sequelize-cli db:seed:all",
+    "seedreservations": "npx sequelize-cli db:seed --seed seeders/20230928122513-demo-reservation.js",
+    "seedusers": "npx sequelize-cli db:seed --seed seeders/20230928130054-demo-users.js",
     "prepare": "husky install"
   },
   "dependencies": {
