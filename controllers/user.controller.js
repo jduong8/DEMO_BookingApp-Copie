@@ -14,14 +14,14 @@ exports.findAll = (req, res) => {
   // Liste des attributs à exclure dans la réponse
   const attributesToExclude = ["user_password"];
 
-  // Si l'utilisateur est un Admin, récupérer uniquement les utilisateurs avec le rôle Client
+  // Si l'utilisateur est un Admin, on récupère uniquement les utilisateurs avec le rôle Client
   if (req.user.user_role === USER_ROLE.ADMIN) {
     whereCondition.user_role = USER_ROLE.CLIENT;
   }
-  // Si l'utilisateur est un Super_admin, récupérer les utilisateurs avec les rôles Admin et Client
+  // Si l'utilisateur est un Super_admin, on récupère les utilisateurs avec les rôles Admin et Client
   else if (req.user.user_role === USER_ROLE.MASTER) {
     whereCondition.user_role = { [Op.in]: [USER_ROLE.ADMIN, USER_ROLE.CLIENT] };
-    // Exclure également les informations du Super_Admin lui-même
+    // On exclu également les informations du Super_Admin lui-même (ne -> not equal)
     whereCondition.id = { [Op.ne]: req.user.id };
   }
 
