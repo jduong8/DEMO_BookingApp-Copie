@@ -2,6 +2,8 @@ const db = require("../db.js");
 const Reservation = db.reservation;
 const ADMIN = "Admin";
 const SUPER_ADMIN = "Super_admin";
+const RESERVATION_STATUS = require("../models/reservationStatus.model.js");
+const formatter = require("../helpers/dateTimeFormatter.js");
 
 exports.findAll = async (req, res, next) => {
   try {
@@ -18,8 +20,21 @@ exports.findAll = async (req, res, next) => {
         },
       });
     }
+    // Formattage de reservation_date et reservation_time pour chaque réservation individuellement
+    const formattedReservations = reservations.map((reservation) => {
+      const reservationData = reservation.toJSON();
 
-    res.send(reservations);
+      reservationData.reservation_date = formatter.formatDate(
+        reservationData.reservation_date,
+      );
+      reservationData.reservation_time = formatter.formatTime(
+        reservationData.reservation_time,
+      );
+
+      return reservationData;
+    });
+
+    res.send(formattedReservations);
   } catch (error) {
     next(error);
   }
@@ -27,37 +42,48 @@ exports.findAll = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
   try {
-    console.log("Req User:", req.user.id);
     const {
       number_of_customers,
       reservation_date,
+      reservation_time,
       reservation_name,
       reservation_note,
     } = req.body;
 
-    const validations = {
-      number_of_customers: "number",
-      reservation_date: "string",
-      reservation_name: "string",
-      reservation_note: "string",
-    };
-
-    for (const [key, type] of Object.entries(validations)) {
-      if (typeof req.body[key] !== type) {
-        return res.status(422).json({ error: `${key} must be a ${type}` });
-      }
+    // Validation du format de la date et de l'heure
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(reservation_date) ||
+      !/^\d{2}:\d{2}$/.test(reservation_time)
+    ) {
+      return res.status(422).json({
+        error: "Invalid date or time format",
+        date: "Valid format YYYY-MM-DD",
+        time: "Valid format HH:MM",
+      });
     }
 
-    const reservation = await Reservation.create({
-      number_of_customers: number_of_customers,
-      reservation_date: reservation_date,
-      reservation_name: reservation_name,
-      reservation_note: reservation_note,
-      reservation_status: 1,
-      userId: req.user.id, // supposant que l'utilisateur actuel est stocké dans req.user
+    const newReservation = await Reservation.create({
+      number_of_customers,
+      reservation_date,
+      reservation_time,
+      reservation_name,
+      reservation_note,
+      reservation_status: RESERVATION_STATUS.PENDING,
+      userId: req.user.id,
     });
-    res.send(reservation);
+
+    // Convertir l'objet de réservation en JSON pour la réponse
+    const reservationResponse = newReservation.toJSON();
+    reservationResponse.reservation_date = formatter.formatDate(
+      reservationResponse.reservation_date,
+    );
+    reservationResponse.reservation_time = formatter.formatTime(
+      reservationResponse.reservation_time,
+    );
+
+    res.send(reservationResponse);
   } catch (error) {
+    console.error("Reservation creation error:", error);
     next(error);
   }
 };
@@ -75,33 +101,38 @@ exports.update = async (req, res, next) => {
     });
   }
 
-  // Vérifier que l'utilisateur actuellement connecté est l'auteur de la réservation
-  if (reservation.userId !== req.user.id) {
-    return res.status(403).send({
-      error: "User not authorized to update this reservation",
-    });
-  }
-
   try {
+    // Préparer l'objet de mise à jour
+    const reservation = {
+      number_of_customers: req.body.number_of_customers,
+      reservation_date: req.body.reservation_date,
+      reservation_time: req.body.reservation_time,
+      reservation_name: req.body.reservation_name,
+      reservation_note: req.body.reservation_note,
+    };
+
+    // Si l'utilisateur est un administrateur, permettre la mise à jour du statut
+    if (req.user.user_role === "Admin") {
+      reservation.reservation_status = req.body.reservation_status;
+    } else if (reservation.userId !== req.user.id) {
+      // Si l'utilisateur n'est ni l'auteur de la réservation ni un administrateur, refuser l'accès
+      return res.status(403).send({
+        error: "Your are not authorized to update this reservation",
+      });
+    }
+
     // Mettre à jour la réservation
-    await Reservation.update(
-      {
-        number_of_customers: req.body.number_of_customers,
-        reservation_date: req.body.reservation_date,
-        reservation_name: req.body.reservation_name,
-        reservation_note: req.body.reservation_note,
-        reservation_status: 1,
+    await Reservation.update(reservation, {
+      where: {
+        id: reservationId,
       },
-      {
-        where: {
-          id: reservationId,
-        },
-      },
-    );
+    });
+
     res.status(200).send({
       message: `Reservation updated for reservationID: ${reservationId}`,
     });
   } catch (error) {
+    console.error("Error updating reservation:", error);
     next(error);
   }
 };
@@ -122,13 +153,9 @@ exports.delete = async (req, res, next) => {
   // Vérifier que l'utilisateur actuellement connecté est l'auteur de la réservation,
   // ou qu'il a le rôle d'admin ou de super_admin
   const userRole = req.user.user_role;
-  if (
-    reservation.userId !== req.user.id &&
-    userRole !== ADMIN &&
-    userRole !== SUPER_ADMIN
-  ) {
+  if (userRole !== ADMIN) {
     return res.status(403).send({
-      message: "User not authorized to delete this reservation",
+      message: "Your are not authorized to delete this reservation",
     });
   }
   try {
