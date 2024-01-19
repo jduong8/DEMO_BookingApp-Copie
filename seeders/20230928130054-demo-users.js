@@ -1,30 +1,50 @@
 "use strict";
+const USER_ROLE = require("../models/userRole.model.js");
 const bcrypt = require("bcrypt");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Hashage du mot de passe pour l'administrateur
-    const saltAdmin = await bcrypt.genSalt(10);
-    const hashedPasswordAdmin = await bcrypt.hash("securepassword", saltAdmin);
+    // Création de clients
+    const adminstrators = [
+      {
+        user_role: USER_ROLE.MASTER,
+        firstname: "Super",
+        lastname: "Admin",
+        email: "master@example.com",
+        phone: "2345678901",
+        user_password: "master12345678",
+      },
+      {
+        user_role: USER_ROLE.ADMIN,
+        firstname: "Clark",
+        lastname: "Kent",
+        email: "superman@example.com",
+        phone: "1234567890",
+        user_password: "clark12345678",
+      },
+    ];
 
-    // Insertion de l'administrateur
-    await queryInterface.bulkInsert(
-      "Users",
-      [
-        {
-          user_role: "Admin",
-          firstname: "Clark",
-          lastname: "Kent",
-          email: "superman@example.com",
-          phone: "1234567890",
-          user_password: hashedPasswordAdmin,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ],
-      {},
-    );
+    for (const admin of adminstrators) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(admin.user_password, salt);
+      await queryInterface.bulkInsert(
+        "Users",
+        [
+          {
+            user_role: admin.user_role,
+            firstname: admin.firstname,
+            lastname: admin.lastname,
+            email: admin.email,
+            phone: admin.phone,
+            user_password: hashedPassword,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+        {},
+      );
+    }
 
     // Création de clients
     const clients = [
@@ -65,7 +85,7 @@ module.exports = {
         "Users",
         [
           {
-            user_role: "Client",
+            user_role: USER_ROLE.CLIENT,
             firstname: client.firstname,
             lastname: client.lastname,
             email: client.email,

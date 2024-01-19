@@ -8,6 +8,7 @@ const HOTMAIL_ADDRESS = process.env.HOTMAIL_ADDRESS;
 const HOTMAIL_PASSWORD = process.env.HOTMAIL_PASSWORD;
 const validator = require("validator");
 const nodemailer = require("nodemailer");
+const USER_ROLE = require("../models/userRole.model.js");
 
 exports.create = async (req, res) => {
   try {
@@ -20,16 +21,16 @@ exports.create = async (req, res) => {
     let currentUserRole;
     // Vérification du rôle de l'utilisateur actuel s'il souhaite assigner un rôle spécifique
     if (user_role) {
-      currentUserRole = req.user ? req.user.role : "client"; // Supposons que vous ayez le rôle de l'utilisateur actuel dans req.user
-      if (user_role === "admin" && currentUserRole !== "super_admin") {
-        return res
-          .status(403)
-          .json({ message: "Only a Super Admin can assign the Admin role" });
+      currentUserRole = req.user ? req.user.role : USER_ROLE.CLIENT;
+      if (currentUserRole !== USER_ROLE.MASTER) {
+        return res.status(403).json({ message: "Permission denied" });
       }
     }
     // Si un rôle n'est pas spécifié ou si l'utilisateur n'a pas les droits pour assigner un rôle, assigner le rôle 'client' par défaut
     const assignedRole =
-      user_role && currentUserRole === "super_admin" ? user_role : "client";
+      user_role && currentUserRole === USER_ROLE.MASTER
+        ? user_role
+        : USER_ROLE.CLIENT;
     // Hashage du mot de passe
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(user_password, salt);
