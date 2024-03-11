@@ -18,13 +18,12 @@ const db = {};
 
 // Importation les modèles
 db.user = require("./models/user.model.js")(sequelize);
-db.spot = require("./models/spot.model.js")(sequelize);
-db.room = require("./models/room.model.js")(sequelize);
+db.place = require("./models/place.model.js")(sequelize);
 db.reservation = require("./models/reservation.model.js")(sequelize);
 
 // Synchronisation avec la base de données
 sequelize
-  .sync({ force: false })
+  .sync({ force: true })
   .then(() => {
     console.log("Les tables ont été créées !");
   })
