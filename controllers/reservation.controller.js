@@ -1,7 +1,6 @@
 const db = require("../db.js");
 const Reservation = db.reservation;
-const ADMIN = "Admin";
-const SUPER_ADMIN = "Super_admin";
+const USER_ROLE = require("../models/userRole.model.js");
 const RESERVATION_STATUS = require("../models/reservationStatus.model.js");
 const formatter = require("../helpers/dateTimeFormatter.js");
 
@@ -10,7 +9,10 @@ exports.findAll = async (req, res, next) => {
     let reservations;
 
     // Si l'utilisateur est un admin ou un super_admin: récupérer toutes les réservations
-    if (req.user.user_role === ADMIN || req.user.user_role === SUPER_ADMIN) {
+    if (
+      req.user.user_role === USER_ROLE.ADMIN ||
+      req.user.user_role === USER_ROLE.MASTER
+    ) {
       reservations = await Reservation.findAll();
     } else {
       // Sinon, récupérer uniquement les réservations créées par l'utilisateur actuel
