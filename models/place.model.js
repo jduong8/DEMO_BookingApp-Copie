@@ -10,7 +10,6 @@ module.exports = (sequelize) => {
       },
       is_available: {
         type: DataTypes.BOOLEAN,
-        value: false,
         allowNull: false,
       },
     },
