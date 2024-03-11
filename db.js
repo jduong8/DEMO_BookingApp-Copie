@@ -20,6 +20,8 @@ const db = {};
 db.user = require("./models/user.model.js")(sequelize);
 db.place = require("./models/place.model.js")(sequelize);
 db.reservation = require("./models/reservation.model.js")(sequelize);
+db.product = require("./models/product.model.js")(sequelize);
+db.order = require("./models/order.model.js")(sequelize);
 
 // Synchronisation avec la base de données
 sequelize
