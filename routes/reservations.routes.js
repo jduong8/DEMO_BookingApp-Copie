@@ -8,18 +8,26 @@ const router = express.Router();
 router.get("/reservations/all", verifyJWT, reservationController.findAll);
 
 // POST data
-router.post("/reservations", verifyJWT, reservationController.create);
+router.post("/reservation/create", verifyJWT, reservationController.create);
 
 // PUT data
-router.put("/reservations/:id", verifyJWT, reservationController.update);
 router.put(
-  "/place/reservations/:id",
+  "/reservations/:id/info/update",
+  verifyJWT,
+  reservationController.update,
+);
+router.put(
+  "/reservations/:id/confirmed",
   verifyJWT,
   reservationController.confirmReservation,
 );
 
 // DELETE data
-router.delete("/reservations/:id", verifyJWT, reservationController.delete);
+router.delete(
+  "/reservations/:id/delete",
+  verifyJWT,
+  reservationController.delete,
+);
 
 // Exportation du routeur pour être utilisé dans d'autres parties de l'application
 module.exports = router;

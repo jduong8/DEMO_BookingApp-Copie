@@ -1,8 +1,8 @@
 const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-  const Place = sequelize.define(
-    "Place",
+  const Table = sequelize.define(
+    "Table",
     {
       seats_count: {
         type: DataTypes.INTEGER,
@@ -12,8 +12,12 @@ module.exports = (sequelize) => {
         type: DataTypes.BOOLEAN,
         allowNull: false,
       },
+      has_seated_guests: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+      },
     },
     {},
   );
-  return Place;
+  return Table;
 };

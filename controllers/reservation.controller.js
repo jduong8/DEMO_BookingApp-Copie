@@ -1,6 +1,6 @@
 const db = require("../db.js");
 const Reservation = db.reservation;
-const Place = db.place;
+const Table = db.table;
 const USER_ROLE = require("../models/userRole.model.js");
 const RESERVATION_STATUS = require("../models/reservationStatus.model.js");
 const formatter = require("../helpers/dateTimeFormatter.js");
@@ -93,46 +93,46 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   const reservationId = req.params.id;
-
-  // Trouver la réservation dans la base de données
-  const reservation = await Reservation.findByPk(reservationId);
-
-  // Si la réservation n'existe pas, renvoyer une erreur
-  if (!reservation) {
-    return res.status(404).send({
-      error: `Reservation not found with id: ${reservationId}`,
-    });
-  }
+  const {
+    number_of_customers,
+    reservation_date,
+    reservation_time,
+    reservation_name,
+    reservation_note,
+  } = req.body;
 
   try {
-    // Préparer l'objet de mise à jour
-    const reservation = {
-      number_of_customers: req.body.number_of_customers,
-      reservation_date: req.body.reservation_date,
-      reservation_time: req.body.reservation_time,
-      reservation_name: req.body.reservation_name,
-      reservation_note: req.body.reservation_note,
-    };
+    // Recherche de la réservation dans la base de données
+    const reservation = await Reservation.findByPk(reservationId);
 
-    // Si l'utilisateur est un administrateur, permettre la mise à jour du statut
-    if (req.user.user_role === "Admin") {
-      reservation.reservation_status = req.body.reservation_status;
-    } else if (reservation.userId !== req.user.id) {
-      // Si l'utilisateur n'est ni l'auteur de la réservation ni un administrateur, refuser l'accès
-      return res.status(403).send({
-        error: "Your are not authorized to update this reservation",
-      });
+    // Si la réservation n'existe pas, on renvoie une erreur
+    if (!reservation) {
+      return res
+        .status(404)
+        .json({ message: `Reservation not found with id: ${reservationId}` });
+    }
+
+    // Vérifie si le nombre de personnes a changé pour une réservation confirmée
+    if (
+      reservation.reservation_status === RESERVATION_STATUS.CONFIRMED &&
+      reservation.number_of_customers !== number_of_customers
+    ) {
+      reservation.reservation_status = RESERVATION_STATUS.PENDING;
     }
 
     // Mettre à jour la réservation
-    await Reservation.update(reservation, {
-      where: {
-        id: reservationId,
-      },
+    await reservation.update({
+      number_of_customers,
+      reservation_date,
+      reservation_time,
+      reservation_name,
+      reservation_note,
+      reservation_status: reservation.reservation_status,
     });
 
-    res.status(200).send({
+    res.status(200).json({
       message: `Reservation updated for reservationID: ${reservationId}`,
+      reservation,
     });
   } catch (error) {
     console.error("Error updating reservation:", error);
@@ -188,41 +188,39 @@ exports.confirmReservation = async (req, res, next) => {
       req.user.user_role !== USER_ROLE.ADMIN &&
       req.user.user_role !== USER_ROLE.MASTER
     ) {
-      return res
-        .status(403)
-        .json({
-          message:
-            "Access denied. Only admins and masters can confirm reservations.",
-        });
+      return res.status(403).json({
+        message:
+          "Access denied. Only admins and masters can confirm reservations.",
+      });
     }
 
-    // Trouver une place disponible qui correspond au nombre de clients
-    const place = await Place.findOne({
+    // Trouver une table disponible qui correspond au nombre de clients
+    const getOneTable = await Table.findOne({
       where: {
         seats_count: reservation.number_of_customers,
         is_available: true,
       },
     });
 
-    if (!place) {
+    if (!getOneTable) {
       return res.status(404).json({
-        message: `No available place found for ${reservation.number_of_customers} customers.`,
+        message: `No available table found for ${reservation.number_of_customers} customers.`,
       });
     }
 
-    // Met à jour la réservation avec l'ID de la place et confirme la réservation
+    // Met à jour la réservation avec l'ID de la table et confirme la réservation
     await reservation.update({
-      placeId: place.id,
+      tableId: getOneTable.id,
       reservation_status: RESERVATION_STATUS.CONFIRMED,
     });
 
-    // Marque la place comme n'étant plus disponible
-    await place.update({ is_available: false });
+    // Marque la table comme n'étant plus disponible
+    await getOneTable.update({ is_available: false });
 
     res.status(200).json({
-      message: `Reservation confirmed with place ${place.id} now reserved and not available.`,
+      message: `Reservation confirmed for ${reservation.number_of_customers} customers. Table ${getOneTable.id} now reserved`,
       reservation: reservation,
-      place: place,
+      table: getOneTable,
     });
   } catch (error) {
     console.error("Error confirming reservation:", error);
