@@ -24,7 +24,11 @@ db.product = require("./models/product.model.js")(sequelize);
 db.order = require("./models/order.model.js")(sequelize);
 
 // Définition des associations
-db.user.hasMany(db.reservation, { onDelete: "CASCADE", foreignKey: "userId" });
+db.user.hasMany(db.reservation, {
+  onDelete: "CASCADE",
+  foreignKey: "userId",
+});
+
 db.place.hasMany(db.reservation, {
   onDelete: "CASCADE",
   foreignKey: "placeId",
