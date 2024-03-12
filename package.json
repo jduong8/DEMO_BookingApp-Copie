@@ -9,6 +9,7 @@
     "seedall": "npx sequelize-cli db:seed:all",
     "seedreservations": "npx sequelize-cli db:seed --seed seeders/20230928122513-demo-reservation.js",
     "seedusers": "npx sequelize-cli db:seed --seed seeders/20230928130054-demo-users.js",
+    "seedplaces": "npx sequelize-cli db:seed --seed seeders/20240312094259-place.js",
     "prepare": "husky install"
   },
   "dependencies": {

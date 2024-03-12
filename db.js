@@ -23,6 +23,16 @@ db.reservation = require("./models/reservation.model.js")(sequelize);
 db.product = require("./models/product.model.js")(sequelize);
 db.order = require("./models/order.model.js")(sequelize);
 
+// Définition des associations
+db.user.hasMany(db.reservation, { onDelete: "CASCADE", foreignKey: "userId" });
+// db.reservation.belongsTo(db.user, { foreignKey: 'userId' });
+
+db.place.hasMany(db.reservation, {
+  onDelete: "CASCADE",
+  foreignKey: "placeId",
+});
+// db.reservation.belongsTo(db.place, { foreignKey: 'placeId' });
+
 // Synchronisation avec la base de données
 sequelize
   .sync({ force: true })

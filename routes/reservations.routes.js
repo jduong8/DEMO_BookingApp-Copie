@@ -12,6 +12,11 @@ router.post("/reservations", verifyJWT, reservationController.create);
 
 // PUT data
 router.put("/reservations/:id", verifyJWT, reservationController.update);
+router.put(
+  "/place/reservations/:id",
+  verifyJWT,
+  reservationController.confirmReservation,
+);
 
 // DELETE data
 router.delete("/reservations/:id", verifyJWT, reservationController.delete);
