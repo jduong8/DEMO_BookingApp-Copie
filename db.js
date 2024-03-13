@@ -18,20 +18,35 @@ const db = {};
 
 // Importation les modèles
 db.user = require("./models/user.model.js")(sequelize);
-db.place = require("./models/place.model.js")(sequelize);
+db.table = require("./models/table.model.js")(sequelize);
 db.reservation = require("./models/reservation.model.js")(sequelize);
 db.product = require("./models/product.model.js")(sequelize);
 db.order = require("./models/order.model.js")(sequelize);
 
-// Définition des associations
+// Définition des associations 1:N
 db.user.hasMany(db.reservation, {
   onDelete: "CASCADE",
   foreignKey: "userId",
 });
 
-db.place.hasMany(db.reservation, {
+db.table.hasMany(db.reservation, {
   onDelete: "CASCADE",
-  foreignKey: "placeId",
+  foreignKey: "tableId",
+});
+
+db.product.hasMany(db.order, {
+  onDelete: "CASCADE",
+  foreignKey: "productId",
+});
+
+db.table.hasMany(db.order, {
+  onDelete: "CASCADE",
+  foreignKey: "tableId",
+});
+
+db.order.belongsTo(db.product, {
+  foreignKey: "productId",
+  as: "product",
 });
 
 // Synchronisation avec la base de données
