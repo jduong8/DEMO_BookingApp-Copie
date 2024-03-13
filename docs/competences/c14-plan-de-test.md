@@ -27,7 +27,7 @@
 | Tâche                                                 | Validée | Lien vers le fichier/ligne de code |
 | ----------------------------------------------------- | :-----: | ---------------------------------- |
 | Implémentation des tests unitaires avec Jest          |   🟠    |                                    |
-| Implémentation des tests d'intégration avec Supertest |   ❌    |                                    |
+| Implémentation des tests d'intégration avec Supertest |   🟠    |                                    |
 
 ### Tests Fonctionnels
 

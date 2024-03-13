@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 // POST User
-router.post("/signup", authController.create);
+router.post("/signup", authController.createAccount);
 
 // Get Token from POST request
 router.post("/signin", authController.connect);

@@ -1,8 +1,7 @@
 const db = require("../db.js");
 const Product = db.product;
-const USER_ROLE = require("../models/userRole.model.js");
 
-exports.getAllProduct = async (req, res, next) => {
+exports.getAllProducts = async (req, res, next) => {
   try {
     const products = await Product.findAll();
     // Formater chaque prix des produits pour l'affichage
@@ -40,20 +39,10 @@ exports.getOneProduct = async (req, res, next) => {
   }
 };
 
-exports.create = async (req, res, next) => {
+exports.addNewProduct = async (req, res, next) => {
   const { name, description, price, category } = req.body;
 
   try {
-    // Vérification des rôles utilisateur
-    if (
-      req.user.user_role !== USER_ROLE.ADMIN &&
-      req.user.user_role !== USER_ROLE.MASTER
-    ) {
-      return res.status(403).json({
-        message: "Access denied. Only admins and masters can create products.",
-      });
-    }
-
     // Vérification que name, description et category sont des chaînes de caractères
     if (
       typeof name !== "string" ||
@@ -88,21 +77,11 @@ exports.create = async (req, res, next) => {
   }
 };
 
-exports.update = async (req, res, next) => {
+exports.updateProduct = async (req, res, next) => {
   const { id } = req.params; // Récupération de l'identifiant du produit depuis les paramètres de la requête
   const { name, description, price, category } = req.body;
 
   try {
-    // Vérification des rôles utilisateur
-    if (
-      req.user.user_role !== USER_ROLE.ADMIN &&
-      req.user.user_role !== USER_ROLE.MASTER
-    ) {
-      return res.status(403).json({
-        message: "Access denied. Only admins and masters can update products.",
-      });
-    }
-
     // Recherche du produit à mettre à jour
     const product = await Product.findByPk(id);
 
@@ -146,20 +125,10 @@ exports.update = async (req, res, next) => {
   }
 };
 
-exports.delete = async (req, res, next) => {
+exports.deleteProduct = async (req, res, next) => {
   const { id } = req.params; // Récupération de l'identifiant du produit depuis les paramètres de la requête
 
   try {
-    // Vérification des rôles utilisateur
-    if (
-      req.user.user_role !== USER_ROLE.ADMIN &&
-      req.user.user_role !== USER_ROLE.MASTER
-    ) {
-      return res.status(403).json({
-        message: "Access denied. Only admins can delete products.",
-      });
-    }
-
     // Recherche du produit à supprimer
     const product = await Product.findByPk(id);
 

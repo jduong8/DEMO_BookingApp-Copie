@@ -1,32 +1,50 @@
 require("dotenv").config();
 const reservationController = require("../controllers/reservation.controller.js");
 const verifyJWT = require("../middlewares/jwt.middleware");
+const checkRole = require("../middlewares/checkRole.middleware.js");
+const checkAuthorOrAdmin = require("../middlewares/checkAuthorOrAdmins.middleware.js");
+const USER_ROLE = require("../models/userRole.model.js");
+const db = require("../db.js");
 const express = require("express");
 const router = express.Router();
 
-// GET home page
-router.get("/reservations/all", verifyJWT, reservationController.findAll);
+// GET All reservations
+router.get(
+  "/reservations/all",
+  verifyJWT,
+  checkRole([USER_ROLE.ADMIN, USER_ROLE.MASTER, USER_ROLE.CLIENT]),
+  reservationController.getAllReservations,
+);
 
-// POST data
-router.post("/reservation/create", verifyJWT, reservationController.create);
+// Create new reservation
+router.post(
+  "/reservation/create",
+  verifyJWT,
+  reservationController.createNewReservation,
+);
 
-// PUT data
+// Update own reservation
 router.put(
   "/reservations/:id/info/update",
   verifyJWT,
-  reservationController.update,
+  checkAuthorOrAdmin(db.reservation),
+  reservationController.updateReservation,
 );
+
+// Update reservation status
 router.put(
   "/reservations/:id/confirmed",
   verifyJWT,
+  checkRole([USER_ROLE.ADMIN, USER_ROLE.MASTER]),
   reservationController.confirmReservation,
 );
 
-// DELETE data
+// DELETE reservation
 router.delete(
   "/reservations/:id/delete",
   verifyJWT,
-  reservationController.delete,
+  checkRole([USER_ROLE.ADMIN, USER_ROLE.MASTER]),
+  reservationController.deleteReservation,
 );
 
 // Exportation du routeur pour être utilisé dans d'autres parties de l'application
