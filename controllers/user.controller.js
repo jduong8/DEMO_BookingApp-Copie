@@ -14,15 +14,21 @@ exports.getAllUsers = (req, res) => {
   // Liste des attributs à exclure dans la réponse
   const attributesToExclude = ["user_password"];
 
-  // Si l'utilisateur est un Admin, on récupère uniquement les utilisateurs avec le rôle Client
-  if (req.user.user_role === USER_ROLE.ADMIN) {
-    whereCondition.user_role = USER_ROLE.CLIENT;
-  }
-  // Si l'utilisateur est un Super_admin, on récupère les utilisateurs avec les rôles Admin et Client
-  else if (req.user.user_role === USER_ROLE.MASTER) {
-    whereCondition.user_role = { [Op.in]: [USER_ROLE.ADMIN, USER_ROLE.CLIENT] };
-    // On exclu également les informations du Super_Admin lui-même (ne -> not equal)
-    whereCondition.id = { [Op.ne]: req.user.id };
+  // Un client n'est pas autorisé à récupérer la liste de tous les utilisateurs
+  switch (req.user.user_role) {
+    case USER_ROLE.ADMIN:
+      whereCondition.user_role = USER_ROLE.CLIENT;
+      break;
+    case USER_ROLE.MASTER:
+      whereCondition.user_role = {
+        [Op.in]: [USER_ROLE.ADMIN, USER_ROLE.CLIENT],
+      };
+      whereCondition.id = { [Op.ne]: req.user.id }; // On exclue le Super Admin lui même
+      break;
+    case USER_ROLE.CLIENT:
+      return res.status(403).json({ message: "Access denied" });
+    default:
+      return res.status(403).json({ message: "Invalid user role" });
   }
 
   User.findAll({
@@ -236,10 +242,6 @@ exports.updatePassword = async (req, res) => {
 /* DELETE */
 exports.deleteUser = async (req, res) => {
   const userId = req.params.id;
-  const currentUser = req.user;
-
-  const userToDelete = await User.findByPk(userId);
-  if (!userToDelete) return res.status(404).json({ message: "User not found" });
 
   User.destroy({
     where: {

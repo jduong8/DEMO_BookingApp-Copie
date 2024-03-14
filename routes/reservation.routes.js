@@ -27,7 +27,7 @@ router.post(
 router.put(
   "/reservations/:id/info/update",
   verifyJWT,
-  checkAuthorOrAdmin(db.reservation),
+  checkAuthorOrAdmin(db.reservation, "Reservation"),
   reservationController.updateReservation,
 );
 
