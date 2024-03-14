@@ -6,14 +6,14 @@ var router = express.Router();
 const reservationsRouter = require("./reservation.routes.js");
 const usersRouter = require("./user.routes.js");
 const authRouter = require("./auth.routes.js");
-const placeRouter = require("./table.routes.js");
+const tableRouter = require("./table.routes.js");
 const productRouter = require("./product.routes.js");
 const orderRouter = require("./order.routes.js");
 
 router.use(reservationsRouter);
 router.use(usersRouter);
 router.use(authRouter);
-router.use(placeRouter);
+router.use(tableRouter);
 router.use(productRouter);
 router.use(orderRouter);
 

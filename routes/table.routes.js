@@ -6,7 +6,7 @@ const USER_ROLE = require("../models/userRole.model.js");
 const express = require("express");
 const router = express.Router();
 
-// Get all places
+// Get all tables
 router.get("/tables/all", verifyJWT, tableController.getAllTables);
 
 // Create new table

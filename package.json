@@ -7,10 +7,10 @@
     "test": "NODE_ENV=development jest",
     "prettier": "npx prettier . --write",
     "seedall": "npx sequelize-cli db:seed:all",
-    "seedreservations": "npx sequelize-cli db:seed --seed seeders/20230928122513-demo-reservation.js",
-    "seedusers": "npx sequelize-cli db:seed --seed seeders/20230928130054-demo-users.js",
-    "seedtables": "npx sequelize-cli db:seed --seed seeders/20240312175251-table.js",
-    "seedproducts": "npx sequelize-cli db:seed --seed seeders/20240312141159-products.js",
+    "seedusers": "npx sequelize-cli db:seed --seed seeders/20240314101137-mock-users.js",
+    "seedreservations": "npx sequelize-cli db:seed --seed seeders/20240314101150-mock-reservations.js",
+    "seedtables": "npx sequelize-cli db:seed --seed seeders/20240314101211-mock-tables.js",
+    "seedproducts": "npx sequelize-cli db:seed --seed seeders/20240314101202-mock-products.js",
     "prepare": "husky install"
   },
   "dependencies": {
