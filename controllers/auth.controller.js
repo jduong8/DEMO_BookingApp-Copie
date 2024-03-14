@@ -10,30 +10,23 @@ const validator = require("validator");
 const nodemailer = require("nodemailer");
 const USER_ROLE = require("../models/userRole.model.js");
 
-exports.create = async (req, res) => {
+exports.createAccount = async (req, res) => {
   try {
     // Validation des données entrantes
-    const { firstname, lastname, email, phone, user_password, user_role } =
-      req.body;
+    const { firstname, lastname, email, phone, user_password } = req.body;
     if (!firstname || !lastname || !email || !phone || !user_password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    let currentUserRole;
-    // Vérification du rôle de l'utilisateur actuel s'il souhaite assigner un rôle spécifique
-    if (user_role) {
-      currentUserRole = req.user ? req.user.role : USER_ROLE.CLIENT;
-      if (currentUserRole !== USER_ROLE.MASTER) {
-        return res.status(403).json({ message: "Permission denied" });
-      }
+
+    // Validation de l'email
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ message: "Invalid email" });
     }
-    // Si un rôle n'est pas spécifié ou si l'utilisateur n'a pas les droits pour assigner un rôle, assigner le rôle 'client' par défaut
-    const assignedRole =
-      user_role && currentUserRole === USER_ROLE.MASTER
-        ? user_role
-        : USER_ROLE.CLIENT;
+
     // Hashage du mot de passe
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(user_password, salt);
+
     const validations = {
       firstname: "string",
       lastname: "string",
@@ -49,15 +42,17 @@ exports.create = async (req, res) => {
         return res.status(422).json({ error: `${key} must be a ${type}` });
       }
     }
-    // Création de l'utilisateur
+
+    // Création de l'utilisateur avec le rôle CLIENT par défaut
     const user = await User.create({
       firstname,
       lastname,
       email,
       phone,
       user_password: hashedPassword,
-      user_role: assignedRole,
+      user_role: USER_ROLE.CLIENT,
     });
+
     // Renvoyer l'utilisateur créé (sans le mot de passe)
     res.status(201).json({
       message: "User created",
@@ -145,7 +140,6 @@ const sendResetPasswordEmail = async (user, resetUrl) => {
     from: HOTMAIL_ADDRESS,
     to: user.email,
     subject: "Réinitialisation de mot de passe",
-    // text: `Bonjour, veuillez cliquer sur le lien suivant pour réinitialiser votre mot de passe: ${resetUrl}`,
     html: `<p>Bonjour,</p><p>Veuillez cliquer sur le lien suivant pour réinitialiser votre mot de passe:</p><a href="${resetUrl}">${resetUrl}</a>`,
   };
 

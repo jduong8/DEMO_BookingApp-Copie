@@ -16,10 +16,10 @@
 
 | Tâche                                                | Validée | Validation |
 | ---------------------------------------------------- | :-----: | ---------- |
-| Setup indiqué dans la documentation                  |   ✅    |            |
+| Setup indiqué dans la documentation                  |   🟠    |            |
 | Fichier et dossier modèle                            |   ✅    |            |
-| Génération de seed automatisée                       |   🟠    |            |
-| Implémentation de différence base (dev/test/preprod) |   ✅    |            |
+| Génération de seed automatisée                       |   ✅    |            |
+| Implémentation de différente base (dev/test/preprod) |   ✅    |            |
 | Fichier de config + .env éventuellement              |   ✅    |            |
 
 ## Convention

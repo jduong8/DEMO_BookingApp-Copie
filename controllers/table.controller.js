@@ -1,8 +1,7 @@
 const db = require("../db.js");
 const Table = db.table;
-const USER_ROLE = require("../models/userRole.model.js");
 
-exports.findAll = async (req, res, next) => {
+exports.getAllTables = async (req, res, next) => {
   try {
     const tables = await Table.findAll();
     res.send(tables);
@@ -14,16 +13,6 @@ exports.findAll = async (req, res, next) => {
 exports.addNewTable = async (req, res, next) => {
   const { seats_count } = req.body;
   try {
-    // Vérifie si l'utilisateur a le rôle nécessaire pour créer une table
-    if (
-      req.user.user_role !== USER_ROLE.ADMIN &&
-      req.user.user_role !== USER_ROLE.MASTER
-    ) {
-      return res.status(403).json({
-        message: "Access denied. Only administrators can create tables.",
-      });
-    }
-
     // Vérifie que seats_count est un nombre et est positif
     if (!Number.isInteger(seats_count) || seats_count <= 0) {
       return res
@@ -51,16 +40,6 @@ exports.updateSeatsCount = async (req, res, next) => {
   const { seats_count } = req.body;
 
   try {
-    // Vérification des rôles utilisateur
-    if (
-      req.user.user_role !== USER_ROLE.ADMIN &&
-      req.user.user_role !== USER_ROLE.MASTER
-    ) {
-      return res.status(403).json({
-        message: "Access denied. Only admins and masters can update tables.",
-      });
-    }
-
     // Recherche de la table à mettre à jour
     const table = await Table.findByPk(id);
 
@@ -99,17 +78,6 @@ exports.updateSeatedGuestsStatus = async (req, res, next) => {
   const { id } = req.params; // Récupération de l'identifiant de la table depuis les paramètres de la requête
 
   try {
-    // Vérification des rôles utilisateur
-    if (
-      req.user.user_role !== USER_ROLE.ADMIN &&
-      req.user.user_role !== USER_ROLE.MASTER
-    ) {
-      return res.status(403).json({
-        message:
-          "Access denied. Only admins and masters can update table status.",
-      });
-    }
-
     // Recherche de la table à mettre à jour
     const table = await Table.findByPk(id);
 
@@ -135,17 +103,10 @@ exports.updateSeatedGuestsStatus = async (req, res, next) => {
   }
 };
 
-exports.delete = async (req, res, next) => {
+exports.deleteTable = async (req, res, next) => {
   const { id } = req.params; // Récupération de l'identifiant de la table depuis les paramètres de la requête
 
   try {
-    // Vérification si l'utilisateur a le rôle d'administrateur
-    if (req.user.user_role === USER_ROLE.CLIENT) {
-      return res.status(403).json({
-        message: "Access denied. Only admins can delete tables.",
-      });
-    }
-
     // Recherche de la table à supprimer
     const table = await Table.findByPk(id);
 

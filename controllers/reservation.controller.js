@@ -5,25 +5,21 @@ const USER_ROLE = require("../models/userRole.model.js");
 const RESERVATION_STATUS = require("../models/reservationStatus.model.js");
 const formatter = require("../helpers/dateTimeFormatter.js");
 
-exports.findAll = async (req, res, next) => {
+exports.getAllReservations = async (req, res, next) => {
   try {
     let reservations;
 
-    // Si l'utilisateur est un admin ou un super_admin: récupérer toutes les réservations
-    if (
-      req.user.user_role === USER_ROLE.ADMIN ||
-      req.user.user_role === USER_ROLE.MASTER
-    ) {
-      reservations = await Reservation.findAll();
-    } else {
-      // Sinon, récupérer uniquement les réservations créées par l'utilisateur actuel
-      reservations = await Reservation.findAll({
-        where: {
-          userId: req.user.id,
-        },
-      });
-    }
-    // Formattage de reservation_date et reservation_time pour chaque réservation individuellement
+    // Le middleware s'occupe déjà de vérifier si l'utilisateur est un admin ou un master.
+    // Pour les administrateurs ou masters, on récupère toutes les réservations.
+    // Pour les utilisateurs clients, on ne récupère que leurs réservations.
+    const queryOptions =
+      req.user.user_role === USER_ROLE.CLIENT
+        ? { where: { userId: req.user.id } }
+        : {};
+
+    reservations = await Reservation.findAll(queryOptions);
+
+    // Formattage de reservation_date et reservation_time pour chaque réservation
     const formattedReservations = reservations.map((reservation) => {
       const reservationData = reservation.toJSON();
 
@@ -43,7 +39,7 @@ exports.findAll = async (req, res, next) => {
   }
 };
 
-exports.create = async (req, res, next) => {
+exports.createNewReservation = async (req, res, next) => {
   try {
     const {
       number_of_customers,
@@ -91,7 +87,7 @@ exports.create = async (req, res, next) => {
   }
 };
 
-exports.update = async (req, res, next) => {
+exports.updateReservation = async (req, res, next) => {
   const reservationId = req.params.id;
   const {
     number_of_customers,
@@ -140,7 +136,7 @@ exports.update = async (req, res, next) => {
   }
 };
 
-exports.delete = async (req, res, next) => {
+exports.deleteReservation = async (req, res, next) => {
   const reservationId = req.params.id;
 
   // Trouver la réservation dans la base de données
@@ -150,15 +146,6 @@ exports.delete = async (req, res, next) => {
   if (!reservation) {
     return res.status(404).send({
       message: `Reservation not found with id: ${reservationId}`,
-    });
-  }
-
-  // Vérifier que l'utilisateur actuellement connecté est l'auteur de la réservation,
-  // ou qu'il a le rôle d'admin ou de super_admin
-  const userRole = req.user.user_role;
-  if (userRole !== USER_ROLE.ADMIN) {
-    return res.status(403).send({
-      message: "Your are not authorized to delete this reservation",
     });
   }
   try {
@@ -182,16 +169,6 @@ exports.confirmReservation = async (req, res, next) => {
 
     if (!reservation) {
       return res.status(404).json({ message: "Reservation not found." });
-    }
-
-    if (
-      req.user.user_role !== USER_ROLE.ADMIN &&
-      req.user.user_role !== USER_ROLE.MASTER
-    ) {
-      return res.status(403).json({
-        message:
-          "Access denied. Only admins and masters can confirm reservations.",
-      });
     }
 
     // Trouver une table disponible qui correspond au nombre de clients

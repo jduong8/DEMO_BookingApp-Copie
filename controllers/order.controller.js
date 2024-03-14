@@ -1,20 +1,10 @@
 const db = require("../db.js");
 const Order = db.order;
 const Table = db.table;
-const USER_ROLE = require("../models/userRole.model.js");
 
 // Méthode pour récupérer toutes les commandes
 exports.getAllOrder = async (req, res, next) => {
   try {
-    if (
-      req.user.user_role !== USER_ROLE.ADMIN &&
-      req.user.user_role !== USER_ROLE.MASTER
-    ) {
-      return res.status(403).json({
-        message: "Access denied. Only admins can read orders.",
-      });
-    }
-
     const orders = await Order.findAll({
       include: [
         {
@@ -36,15 +26,6 @@ exports.getAllOrderForTable = async (req, res, next) => {
   const { tableId } = req.params;
 
   try {
-    if (
-      req.user.user_role !== USER_ROLE.ADMIN &&
-      req.user.user_role !== USER_ROLE.MASTER
-    ) {
-      return res.status(403).json({
-        message: "Access denied. Only admins can read orders for a table.",
-      });
-    }
-
     const orders = await Order.findAll({
       where: {
         tableId: tableId,
@@ -75,16 +56,6 @@ exports.createOrder = async (req, res, next) => {
   const { productId, tableId, quantity } = req.body;
 
   try {
-    // Vérification des rôles utilisateur
-    if (
-      req.user.user_role !== USER_ROLE.ADMIN &&
-      req.user.user_role !== USER_ROLE.MASTER
-    ) {
-      return res.status(403).json({
-        message: "Access denied. Only admins can create orders.",
-      });
-    }
-
     // Vérification de la présence des champs requis
     if (!productId || !tableId || !quantity) {
       return res.status(400).json({
@@ -136,15 +107,6 @@ exports.updateOrder = async (req, res, next) => {
   const { productId, tableId, quantity } = req.body;
 
   try {
-    if (
-      req.user.user_role !== USER_ROLE.ADMIN &&
-      req.user.user_role !== USER_ROLE.MASTER
-    ) {
-      return res.status(403).json({
-        message: "Access denied. Only admins can update orders.",
-      });
-    }
-
     const order = await Order.findByPk(id);
 
     if (!order) {
@@ -185,15 +147,6 @@ exports.deleteOrder = async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    if (
-      req.user.user_role !== USER_ROLE.ADMIN &&
-      req.user.user_role !== USER_ROLE.MASTER
-    ) {
-      return res.status(403).json({
-        message: "Access denied. Only admins can delete orders.",
-      });
-    }
-
     const order = await Order.findByPk(id);
 
     if (!order) {

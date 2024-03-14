@@ -17,7 +17,7 @@
 
 | Tâches                                        | Statut | Validation |
 | --------------------------------------------- | ------ | ---------- |
-| Les implementations du code sont fonctionnels | 🟠     |            |
+| Les implementations du code sont fonctionnels | ✅     |            |
 
 ## Structure
 
@@ -50,7 +50,7 @@
 
 | Tâches                                                 | Statut | Validation |
 | ------------------------------------------------------ | ------ | ---------- |
-| POSTMAN                                                | ❌     |            |
+| POSTMAN                                                | 🟠     |            |
 | 🔜 Validation des données (express validator)          | ❌     |            |
 | 🔜 Purification des données (JOI)                      | ❌     |            |
 | 🔜 Mise en place des logs (morgan et autre winston)    | ❌     |            |

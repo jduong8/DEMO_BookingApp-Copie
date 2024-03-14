@@ -8,7 +8,7 @@ const SECRET_KEY = process.env.SECRET_KEY;
 const USER_ROLE = require("../models/userRole.model.js");
 
 /* GET */
-exports.findAll = (req, res) => {
+exports.getAllUsers = (req, res) => {
   let whereCondition = {};
 
   // Liste des attributs à exclure dans la réponse
@@ -115,8 +115,43 @@ exports.addSuperAdmin = async (req, res) => {
   }
 };
 
+exports.updateUserRole = async (req, res) => {
+  const { userId } = req.params;
+  const newRole = req.path.includes("/admin")
+    ? USER_ROLE.ADMIN
+    : USER_ROLE.CLIENT;
+
+  try {
+    // Recherche de l'utilisateur à mettre à jour
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Mise à jour du rôle de l'utilisateur
+    await user.update({ user_role: newRole });
+
+    // Renvoyer une réponse de succès
+    res.status(200).json({
+      message: `User role updated to ${newRole} successfully.`,
+      user: {
+        id: user.id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        email: user.email,
+        phone: user.phone,
+        user_role: user.user_role,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating user role:", error);
+    res.status(500).json({ message: "Error updating user role" });
+  }
+};
+
 /* PUT */
-exports.update = async (req, res) => {
+exports.updateUserInfo = async (req, res) => {
   try {
     const userId = parseInt(req.params.id, 10);
     const currentUser = req.user;
@@ -142,14 +177,6 @@ exports.update = async (req, res) => {
       email: req.body.email,
       phone: req.body.phone,
     };
-
-    if (currentUser.user_role === "super_admin" && req.body.user_role) {
-      updatedData.user_role = req.body.user_role;
-    } else if (req.body.user_role) {
-      return res
-        .status(403)
-        .json({ message: "Cannot change role: Permission denied" });
-    }
 
     await User.update(updatedData, {
       where: {
@@ -207,20 +234,12 @@ exports.updatePassword = async (req, res) => {
 };
 
 /* DELETE */
-exports.delete = async (req, res) => {
+exports.deleteUser = async (req, res) => {
   const userId = req.params.id;
   const currentUser = req.user;
 
   const userToDelete = await User.findByPk(userId);
   if (!userToDelete) return res.status(404).json({ message: "User not found" });
-
-  if (
-    currentUser.id !== userToDelete.id &&
-    currentUser.user_role !== "admin" &&
-    currentUser.user_role !== "super_admin"
-  ) {
-    return res.status(403).json({ message: "Permission denied" });
-  }
 
   User.destroy({
     where: {
