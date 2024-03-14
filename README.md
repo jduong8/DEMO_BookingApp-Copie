@@ -1,4 +1,5 @@
 # Atelier de réservation de restaurant.
+
 [Voir brief](./BRIEF.md)
 
 ## Description
@@ -19,7 +20,7 @@ Ce projet comporte la création d'un serveur NodeJS:
 
 ```markdown
 .
-├── __test__
+├── **test**
 │ └── addReservation.test.js
 │ └── getReservations.test.js
 │ └── signin.test.js

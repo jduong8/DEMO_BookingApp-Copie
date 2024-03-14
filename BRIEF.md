@@ -1,28 +1,32 @@
 # Tâches Principales
 
-### Vérifications : 
-- [X] Modèles créés (rooms, user, spot, réservation)
-- [X] Routes POST, GET, PUT, DELETE pour chaque entité
-- [X] Seeds pour toutes les entités
-- [X] Jest et super test implémentés
-- [X] Authentification avec bcrypt et jwt (login/signup)
+### Vérifications :
+
+- [x] Modèles créés (rooms, user, spot, réservation)
+- [x] Routes POST, GET, PUT, DELETE pour chaque entité
+- [x] Seeds pour toutes les entités
+- [x] Jest et super test implémentés
+- [x] Authentification avec bcrypt et jwt (login/signup)
 
 ### À Finaliser :
-- [X] ESLINT / Prettier (Commande : npm run lint)
-- [X] Middleware d'admin (gestion des accès utilisateurs)
-- [X] Rôles utilisateurs modifiables par les admins
-- [X] Admins : accès complet aux spots, rooms, users, réservations
-- [X] Utilisateurs : modification de leurs données personnelles et visualisation de leurs réservations
-- [X] Fonctionnalité de réinitialisation du mot de passe
+
+- [x] ESLINT / Prettier (Commande : npm run lint)
+- [x] Middleware d'admin (gestion des accès utilisateurs)
+- [x] Rôles utilisateurs modifiables par les admins
+- [x] Admins : accès complet aux spots, rooms, users, réservations
+- [x] Utilisateurs : modification de leurs données personnelles et visualisation de leurs réservations
+- [x] Fonctionnalité de réinitialisation du mot de passe
 
 ### Développement en Cours :
-- [X] Documentation du code et README (prérequis, installation, commandes essentielles)
-- [X] Controllers pour les entités (logique métier séparée des routes)
-- [X] Dossier /docs avec fichier doc.md (avancement, bugs, sources, captures d’écran)
+
+- [x] Documentation du code et README (prérequis, installation, commandes essentielles)
+- [x] Controllers pour les entités (logique métier séparée des routes)
+- [x] Dossier /docs avec fichier doc.md (avancement, bugs, sources, captures d’écran)
 - [ ] Nouvelle fonctionnalité : Réservation de plats (nom, description, prix, catégorie, quantité)
 - [ ] Visibilité et réservation des plats par les utilisateurs
 
 ### Bonus
+
 - [ ] Relations entre tables (User ↔ réservation, réservation ↔ spot, spot ↔ réservation)
 - [ ] Swagger pour documentation API
 - [ ] Commitizen et Husky pour gestion de Git
@@ -30,10 +34,10 @@
 - [ ] Front-end HTML/CSS/JS avec fetch pour requêtes API
 
 ### Consignes Supplémentaires
-- [X] Respecter les bonnes pratiques de développement.
-- [X] Prioriser la clarté et l'efficacité du code.
-- [X] Documenter toute avancée significative et difficultés rencontrées.
 
+- [x] Respecter les bonnes pratiques de développement.
+- [x] Prioriser la clarté et l'efficacité du code.
+- [x] Documenter toute avancée significative et difficultés rencontrées.
 
 ## Description / Explications
 
@@ -55,6 +59,7 @@ En sommes, une bonne partie des features sont en place telles que:
 - Modification du status de la réservation (Admin).
 
 **Service user/authentification:**
+
 - Création d'un utilisateur (Client par défaut),
 - Création d'un super admin (Master dans mon cas),
 - Modification du `role` d'un utilisateur (Master),
@@ -64,13 +69,14 @@ En sommes, une bonne partie des features sont en place telles que:
 - Modification du mot de passe (Auteur),
 - Suppression du compte (Auteur, Admin, Master)
 
-
 Fonctionnalité incomplète:
+
 - **Mot de passe oublié.**
-  
+
 Dans l'état actuel, je peux seulement envoyer une requête pour le mot de passe oublié: un mail sera envoyé à l'adresse concernée avec une URL (non configurer).
 
 ## Ressources
+
 [Voir mes ressources](https://github.com/jduong8/DEMO_BookingApp-Copie/blob/main/README.md#ressources)
 
 ## Screenshot
@@ -79,7 +85,7 @@ Dans l'état actuel, je peux seulement envoyer une requête pour le mot de passe
 
 ![Screenshot-ESLINT-results](https://github.com/jduong8/DEMO_BookingApp-Copie/assets/67645352/04cbff90-075c-4781-8dbd-3de00c5656a8)
 
-**TablePlus** 
+**TablePlus**
 
 ![Screenshot-seeders-tablePlus](https://github.com/jduong8/DEMO_BookingApp-Copie/assets/67645352/257900b2-4659-40d2-853b-89d511d38cb3)
 
