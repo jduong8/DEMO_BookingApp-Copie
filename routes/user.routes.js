@@ -1,5 +1,5 @@
 const userController = require("../controllers/user.controller.js");
-const verifyJWT = require("../middlewares/jwt.middleware");
+const verifyJWT = require("../middlewares/jwt.middleware.js");
 const checkRole = require("../middlewares/checkRole.middleware.js");
 const checkAuthorOrAdmin = require("../middlewares/checkAuthorOrAdmins.middleware.js");
 const USER_ROLE = require("../models/userRole.model.js");
