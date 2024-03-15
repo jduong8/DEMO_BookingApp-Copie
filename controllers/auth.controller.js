@@ -75,7 +75,9 @@ exports.connect = async (req, res, next) => {
   try {
     const user = await User.findOne({ where: { email: req.body.email } });
     if (!user) {
-      return res.status(400).send("Incorrect user or password");
+      return res.status(400).json({
+        message: "Incorrect user or password",
+      });
     }
 
     const validPassword = await bcrypt.compare(
@@ -83,7 +85,9 @@ exports.connect = async (req, res, next) => {
       user.user_password,
     );
     if (!validPassword) {
-      return res.status(400).send("Incorrect user or password");
+      return res.status(400).json({
+        message: "Incorrect user or password",
+      });
     }
 
     const payload = {

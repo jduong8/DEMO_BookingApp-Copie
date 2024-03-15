@@ -49,15 +49,32 @@ exports.createNewReservation = async (req, res, next) => {
       reservation_note,
     } = req.body;
 
-    // Validation du format de la date et de l'heure
+    // Vérification de la présence des champs obligatoires
     if (
-      !/^\d{4}-\d{2}-\d{2}$/.test(reservation_date) ||
-      !/^\d{2}:\d{2}$/.test(reservation_time)
+      !number_of_customers ||
+      !reservation_date ||
+      !reservation_time ||
+      !reservation_name
+    ) {
+      return res.status(400).json({
+        error: "Missing required reservation details",
+      });
+    }
+
+    // Validate date format (YYYY-MM-DD)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(reservation_date)) {
+      return res.status(422).json({
+        error: "Invalid date format",
+      });
+    }
+
+    // Validate time format (HH:MM)
+    if (
+      !/^\d{2}:\d{2}$/.test(reservation_time) ||
+      parseInt(reservation_time.split(":")[1], 10) >= 60
     ) {
       return res.status(422).json({
-        error: "Invalid date or time format",
-        date: "Valid format YYYY-MM-DD",
-        time: "Valid format HH:MM",
+        error: "Invalid time format",
       });
     }
 
@@ -100,13 +117,6 @@ exports.updateReservation = async (req, res, next) => {
   try {
     // Recherche de la réservation dans la base de données
     const reservation = await Reservation.findByPk(reservationId);
-
-    // Si la réservation n'existe pas, on renvoie une erreur
-    if (!reservation) {
-      return res
-        .status(404)
-        .json({ message: `Reservation not found with id: ${reservationId}` });
-    }
 
     // Vérifie si le nombre de personnes a changé pour une réservation confirmée
     if (

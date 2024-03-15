@@ -52,7 +52,7 @@ db.order.belongsTo(db.product, {
 
 // Synchronisation avec la base de données
 sequelize
-  .sync({ force: true })
+  .sync({ force: false })
   .then(() => {
     console.log("Les tables ont été créées !");
   })

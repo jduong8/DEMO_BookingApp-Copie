@@ -44,7 +44,7 @@ router.put("/users/:id/update", verifyJWT, userController.updateUserInfo);
 router.delete(
   "/users/:id/delete",
   verifyJWT,
-  checkAuthorOrAdmin(db.user),
+  checkAuthorOrAdmin(db.user, "User"),
   userController.deleteUser,
 );
 
