@@ -2,7 +2,7 @@ const USER_ROLE = require("../models/userRole.model.js");
 
 const checkAuthorOrAdminMiddleware =
   (model, modelName) => async (req, res, next) => {
-    const resourceId = req.params.id;
+    const resourceId = parseInt(req.params.id, 10);
     const currentUser = req.user;
 
     try {
@@ -11,18 +11,50 @@ const checkAuthorOrAdminMiddleware =
         return res.status(404).json({ message: `${modelName} not found.` });
       }
 
-      // Vérifie si l'utilisateur est l'auteur ou un administrateur
-      if (
-        currentUser.id !== resource.userId &&
-        currentUser.user_role !== USER_ROLE.ADMIN &&
-        currentUser.user_role !== USER_ROLE.MASTER
-      ) {
-        return res.status(403).json({ message: "Permission denied." });
+      // Determiner l'ID de l'utilisateur associé à la ressource.
+      // Pour le modèle User, l'ID de l'utilisateur est directement `id`.
+      // Pour les autres modèles, l'ID de l'utilisateur est dans `userId`.
+      const associatedUserId =
+        modelName === "User" ? resource.id : resource.userId;
+
+      // Autoriser le MASTER à effectuer n'importe quelle action.
+      if (currentUser.user_role === USER_ROLE.MASTER) {
+        return next();
       }
 
-      // On assigne la ressource à l'objet de requête
-      req.resource = resource;
-      next();
+      // Autoriser l'ADMIN à se gérer lui-même ou à gérer les CLIENTs uniquement,
+      // mais pas les autres ADMINs ou le MASTER.
+      if (currentUser.user_role === USER_ROLE.ADMIN) {
+        if (resource.user_role === USER_ROLE.MASTER) {
+          return res
+            .status(403)
+            .json({
+              message: "ADMIN - Permission denied for managing MASTER.",
+            });
+        }
+        if (
+          resource.user_role === USER_ROLE.ADMIN &&
+          currentUser.id !== associatedUserId
+        ) {
+          return res
+            .status(403)
+            .json({
+              message: "ADMIN - Permission denied for managing other ADMIN.",
+            });
+        }
+        return next();
+      }
+
+      // Autoriser le CLIENT à se gérer lui-même uniquement.
+      if (
+        currentUser.user_role === USER_ROLE.CLIENT &&
+        currentUser.id === associatedUserId
+      ) {
+        return next();
+      }
+
+      // Dans tous les autres cas, refuser l'accès.
+      return res.status(403).json({ message: "Permission denied." });
     } catch (error) {
       console.error("Middleware error:", error);
       res

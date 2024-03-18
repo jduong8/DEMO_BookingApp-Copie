@@ -12,7 +12,7 @@ module.exports = {
           reservation_time: "12:30",
           reservation_name: "Bob Johnson",
           reservation_note: "Table près de la fenêtre, si possible.",
-          reservation_status: RESERVATION_STATUS.PENDING,
+          reservation_status: RESERVATION_STATUS.CONFIRMED,
           userId: 4,
           createdAt: new Date(),
           updatedAt: new Date(),
