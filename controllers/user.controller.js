@@ -58,6 +58,7 @@ exports.getUserInfo = async (req, res, next) => {
 
     // Sinon, on renvoie les informations de l'utilisateur (sans le mot de passe)
     res.status(200).json({
+      id: user.id,
       firstname: user.firstname,
       lastname: user.lastname,
       email: user.email,
