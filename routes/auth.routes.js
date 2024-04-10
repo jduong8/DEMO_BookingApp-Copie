@@ -1,12 +1,27 @@
 const authController = require("../controllers/auth.controller.js");
+const {
+  signUpValidationRules,
+  signInValidationRules,
+  validate,
+} = require("../middlewares/authenticationValidor.js");
 const express = require("express");
 const router = express.Router();
 
 // POST User
-router.post("/signup", authController.createAccount);
+router.post(
+  "/signup",
+  signUpValidationRules(),
+  validate,
+  authController.createAccount,
+);
 
 // Get Token from POST request
-router.post("/signin", authController.connect);
+router.post(
+  "/signin",
+  signInValidationRules(),
+  validate,
+  authController.connect,
+);
 
 // Send request for reset password
 router.post("/auth/forget-password", authController.forgotPassword);
