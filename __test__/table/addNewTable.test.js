@@ -37,7 +37,29 @@ describe("POST /api/table/create - Add New Table", () => {
     expect(response.status).toBe(403);
   });
 
-  it("should return a 400 error for invalid seats_count", async () => {
+  it("should allow an Admin from creating a table", async () => {
+    const tableData = { seats_count: 2 };
+
+    const response = await request(app)
+      .post("/api/table/create")
+      .set("Authorization", `${adminToken}`)
+      .send(tableData);
+
+    expect(response.status).toBe(200);
+  });
+
+  it("should allow a Master from creating a table", async () => {
+    const tableData = { seats_count: 2 };
+
+    const response = await request(app)
+      .post("/api/table/create")
+      .set("Authorization", `${masterToken}`)
+      .send(tableData);
+
+    expect(response.status).toBe(200);
+  });
+
+  it("should return a 400 error for an invalid number of seats when creating a table", async () => {
     const invalidTableData = { seats_count: -1 };
 
     const response = await request(app)
