@@ -6,6 +6,8 @@ const indexRouter = require("./routes/index");
 const errorHandler = require("./middlewares/errorHandler.middleware");
 const morganMiddleware = require("./middlewares/morgan.middleware");
 const logger = require("./utils/logger");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger-output.json");
 
 var app = express();
 corsOptions = {
@@ -20,6 +22,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(morganMiddleware);
 app.use(errorHandler);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 logger.http("Debut session");
 

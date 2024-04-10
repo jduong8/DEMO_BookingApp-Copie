@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node --watch ./bin/www",
+    "swagger": "node ./swagger.js",
     "test": "NODE_ENV=development jest",
     "prettier": "npx prettier . --write",
     "seedall": "npx sequelize-cli db:seed:all",
@@ -27,6 +28,8 @@
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.33.0",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.0",
     "winston": "^3.12.0"
   },
   "devDependencies": {

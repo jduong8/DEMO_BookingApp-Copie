@@ -54,7 +54,6 @@ PROD_DB_NAME=
 PROD_DB_HOST=
 
 // Pas nécessaire, sauf si vous souhaitez tester le service de Réinitialisation de Mot de passe
-// Il faudra une addresse hotmail pour évitez de faire d'autres configuration
 HOTMAIL_ADDRESS=
 HOTMAIL_PASSWORD=
 ```
