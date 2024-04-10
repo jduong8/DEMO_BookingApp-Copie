@@ -8,13 +8,13 @@ describe("DELETE /api/users/:id - Delete User", () => {
   beforeAll(async () => {
     // Connexion du Master et de l'Admin
     let adminLogin = await request(app).post("/api/signin").send({
-      email: "superman@example.com",
+      email: "superman@gmail.com",
       user_password: "clark12345678",
     });
     adminToken = adminLogin.body.token;
 
     let masterLogin = await request(app).post("/api/signin").send({
-      email: "master@example.com",
+      email: "master@gmail.com",
       user_password: "master12345678",
     });
     masterToken = masterLogin.body.token;
@@ -25,8 +25,8 @@ describe("DELETE /api/users/:id - Delete User", () => {
 
     // Création de deux utilisateurs client
     const client1 = {
-      firstname: "Client1",
-      lastname: "User1",
+      firstname: "Client",
+      lastname: "John",
       email: "client1@example.com",
       phone: "1234567890",
       user_password: "client1234",
@@ -41,8 +41,8 @@ describe("DELETE /api/users/:id - Delete User", () => {
     client1Token = client1Login.body.token;
 
     const client2 = {
-      firstname: "Client2",
-      lastname: "User2",
+      firstname: "Client",
+      lastname: "User",
       email: "client2@example.com",
       phone: "0987654321",
       user_password: "client21234",
@@ -57,8 +57,8 @@ describe("DELETE /api/users/:id - Delete User", () => {
     client2Token = client2Login.body.token;
 
     const client3 = {
-      firstname: "Client3",
-      lastname: "User3",
+      firstname: "Client",
+      lastname: "User",
       email: "client3@example.com",
       phone: "0987654321",
       user_password: "client21234",

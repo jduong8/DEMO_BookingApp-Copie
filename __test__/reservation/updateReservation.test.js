@@ -9,25 +9,25 @@ describe("PUT /reservations/:id/info/update - Update Reservation", () => {
 
   beforeAll(async () => {
     let masterLogin = await request(app).post("/api/signin").send({
-      email: "master@example.com",
+      email: "master@gmail.com",
       user_password: "master12345678",
     });
     masterToken = masterLogin.body.token;
 
     let admin = await request(app).post("/api/signin").send({
-      email: "superman@example.com",
+      email: "superman@gmail.com",
       user_password: "clark12345678",
     });
     adminToken = admin.body.token;
 
     let client = await request(app).post("/api/signin").send({
-      email: "alice@example.com",
+      email: "alice@gmail.com",
       user_password: "alice12345678",
     });
     clientToken = client.body.token;
 
     let anotherClient = await request(app).post("/api/signin").send({
-      email: "bob@example.com",
+      email: "bob@gmail.com",
       user_password: "bob12345678",
     });
     anotherClientToken = anotherClient.body.token;

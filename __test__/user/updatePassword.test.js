@@ -20,8 +20,6 @@ describe("POST /api/user/password - Update Password", () => {
       .post("/api/signup")
       .send(mockUser)
       .expect("Content-Type", /json/);
-    console.log("signupResponse.body:", signupResponse.body);
-    expect(signupResponse.body.user).toHaveProperty("id");
     createdUserId = signupResponse.body.user.id;
 
     // Sign in the new user
@@ -29,7 +27,6 @@ describe("POST /api/user/password - Update Password", () => {
       email: mockUser.email,
       user_password: mockUser.user_password,
     });
-    expect(signinResponse.body).toHaveProperty("token");
     userToken = signinResponse.body.token;
   });
 

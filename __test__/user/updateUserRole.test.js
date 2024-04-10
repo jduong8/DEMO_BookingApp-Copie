@@ -9,25 +9,25 @@ describe("PUT /api/users/:userId/role - Update User Role", () => {
 
   beforeAll(async () => {
     let res = await request(app).post("/api/signin").send({
-      email: "master@example.com",
+      email: "master@gmail.com",
       user_password: "master12345678",
     });
     masterToken = res.body.token;
 
     res = await request(app).post("/api/signin").send({
-      email: "superman@example.com",
+      email: "superman@gmail.com",
       user_password: "clark12345678",
     });
     adminToken = res.body.token;
 
     res = await request(app).post("/api/signin").send({
-      email: "alice@example.com",
+      email: "alice@gmail.com",
       user_password: "alice12345678",
     });
     clientToken = res.body.token;
 
     const targetUserRes = await User.findOne({
-      where: { email: "alice@example.com" },
+      where: { email: "alice@gmail.com" },
     });
     targetUserId = targetUserRes.id;
   });

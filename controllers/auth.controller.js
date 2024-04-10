@@ -12,36 +12,11 @@ const USER_ROLE = require("../models/userRole.model.js");
 
 exports.createAccount = async (req, res) => {
   try {
-    // Validation des données entrantes
     const { firstname, lastname, email, phone, user_password } = req.body;
-    if (!firstname || !lastname || !email || !phone || !user_password) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    // Validation de l'email
-    if (!validator.isEmail(email)) {
-      return res.status(400).json({ message: "Invalid email" });
-    }
 
     // Hashage du mot de passe
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(user_password, salt);
-
-    const validations = {
-      firstname: "string",
-      lastname: "string",
-      email: "string",
-      phone: "string",
-      user_password: "string",
-    };
-
-    for (const [key, type] of Object.entries(validations)) {
-      if (!validator.isEmail(req.body.email)) {
-        return res.status(400).json({ message: "Email invalide" });
-      } else if (typeof req.body[key] !== type) {
-        return res.status(422).json({ error: `${key} must be a ${type}` });
-      }
-    }
 
     // Création de l'utilisateur avec le rôle CLIENT par défaut
     const user = await User.create({

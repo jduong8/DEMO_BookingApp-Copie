@@ -9,7 +9,7 @@ describe("POST /api/signin", () => {
     const res = await request(app)
       .post("/api/signin")
       .send({
-        email: "alice@example.com",
+        email: "alice@gmail.com",
         user_password: "alice12345678",
       })
       .expect(200);

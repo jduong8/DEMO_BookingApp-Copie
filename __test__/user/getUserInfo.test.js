@@ -7,21 +7,21 @@ describe("GET /api/user/info - Get User Information", () => {
 
   beforeAll(async () => {
     let res = await request(app).post("/api/signin").send({
-      email: "master@example.com",
+      email: "master@gmail.com",
       user_password: "master12345678",
     });
     expect(res.body).toHaveProperty("token");
     masterToken = res.body.token;
 
     res = await request(app).post("/api/signin").send({
-      email: "superman@example.com",
+      email: "superman@gmail.com",
       user_password: "clark12345678",
     });
     expect(res.body).toHaveProperty("token");
     adminToken = res.body.token;
 
     res = await request(app).post("/api/signin").send({
-      email: "alice@example.com",
+      email: "alice@gmail.com",
       user_password: "alice12345678",
     });
     expect(res.body).toHaveProperty("token");
@@ -34,7 +34,7 @@ describe("GET /api/user/info - Get User Information", () => {
       .set("Authorization", masterToken)
       .expect(200);
 
-    expect(res.body.email).toEqual("master@example.com");
+    expect(res.body.email).toEqual("master@gmail.com");
     expect(res.body.user_role).toEqual(USER_ROLE.MASTER);
     expect(res.body.user_password).toBeUndefined();
   });
@@ -45,7 +45,7 @@ describe("GET /api/user/info - Get User Information", () => {
       .set("Authorization", adminToken)
       .expect(200);
 
-    expect(res.body.email).toEqual("superman@example.com");
+    expect(res.body.email).toEqual("superman@gmail.com");
     expect(res.body.user_role).toEqual(USER_ROLE.ADMIN);
     expect(res.body.user_password).toBeUndefined();
   });
@@ -56,7 +56,7 @@ describe("GET /api/user/info - Get User Information", () => {
       .set("Authorization", clientToken)
       .expect(200);
 
-    expect(res.body.email).toEqual("alice@example.com");
+    expect(res.body.email).toEqual("alice@gmail.com");
     expect(res.body.user_role).toEqual(USER_ROLE.CLIENT);
     expect(res.body.user_password).toBeUndefined();
   });

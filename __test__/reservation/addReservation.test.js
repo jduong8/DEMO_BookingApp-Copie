@@ -8,7 +8,7 @@ describe("POST /api/reservations", () => {
     // Connexion en tant que client pour récupérer le token
     let res = await request(app)
       .post("/api/signin")
-      .send({ email: "alice@example.com", user_password: "alice12345678" });
+      .send({ email: "alice@gmail.com", user_password: "alice12345678" });
     clientToken = res.body.token;
   });
 
