@@ -9,19 +9,19 @@ describe("GET /api/reservations/all", () => {
     // Connexion en tant qu'Admin
     let res = await request(app)
       .post("/api/signin")
-      .send({ email: "superman@example.com", user_password: "clark12345678" });
+      .send({ email: "superman@gmail.com", user_password: "clark12345678" });
     adminToken = res.body.token;
 
     // Connexion en tant que Super_Admin
     res = await request(app)
       .post("/api/signin")
-      .send({ email: "master@example.com", user_password: "master12345678" });
+      .send({ email: "master@gmail.com", user_password: "master12345678" });
     superAdminToken = res.body.token;
 
     // Connexion en tant que Client
     res = await request(app)
       .post("/api/signin")
-      .send({ email: "alice@example.com", user_password: "alice12345678" });
+      .send({ email: "alice@gmail.com", user_password: "alice12345678" });
     clientToken = res.body.token;
   });
 

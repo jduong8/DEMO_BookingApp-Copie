@@ -8,7 +8,7 @@ describe("GET /api/users - Get All Users", () => {
   beforeAll(async () => {
     // Authentification du MASTER
     let res = await request(app).post("/api/signin").send({
-      email: "master@example.com",
+      email: "master@gmail.com",
       user_password: "master12345678",
     });
     expect(res.body).toHaveProperty("token");
@@ -16,7 +16,7 @@ describe("GET /api/users - Get All Users", () => {
 
     // Authentification d'un ADMIN
     res = await request(app).post("/api/signin").send({
-      email: "superman@example.com",
+      email: "superman@gmail.com",
       user_password: "clark12345678",
     });
     expect(res.body).toHaveProperty("token");
@@ -24,7 +24,7 @@ describe("GET /api/users - Get All Users", () => {
 
     // Authentification d'un CLIENT
     res = await request(app).post("/api/signin").send({
-      email: "alice@example.com",
+      email: "alice@gmail.com",
       user_password: "alice12345678",
     });
     expect(res.body).toHaveProperty("token");
@@ -37,7 +37,7 @@ describe("GET /api/users - Get All Users", () => {
       .set("Authorization", masterToken)
       .expect(200);
 
-    expect(res.body.some((user) => user.email === "master@example.com")).toBe(
+    expect(res.body.some((user) => user.email === "master@gmail.com")).toBe(
       false,
     );
     expect(res.body.some((user) => user.user_role === USER_ROLE.ADMIN)).toBe(

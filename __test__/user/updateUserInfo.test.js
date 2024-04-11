@@ -7,13 +7,13 @@ describe("PUT /api/users/:id/update - Update User Information", () => {
 
   beforeAll(async () => {
     let res = await request(app).post("/api/signin").send({
-      email: "alice@example.com",
+      email: "alice@gmail.com",
       user_password: "alice12345678",
     });
     aliceToken = res.body.token;
 
     res = await request(app).post("/api/signin").send({
-      email: "bob@example.com",
+      email: "bob@gmail.com",
       user_password: "bob12345678",
     });
     bobToken = res.body.token;
@@ -23,7 +23,7 @@ describe("PUT /api/users/:id/update - Update User Information", () => {
     const updatedData = {
       firstname: "AliceUpdated",
       lastname: "SmithUpdated",
-      email: "alice@example.com",
+      email: "alice@gmail.com",
       phone: "9876543210",
     };
 
@@ -38,7 +38,7 @@ describe("PUT /api/users/:id/update - Update User Information", () => {
     const updatedData = {
       firstname: "BobUpdated",
       lastname: "JonesUpdated",
-      email: "bob@example.com",
+      email: "bob@gmail.com",
       phone: "9876501234",
     };
 

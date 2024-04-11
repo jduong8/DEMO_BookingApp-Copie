@@ -7,19 +7,19 @@ describe("POST /products/create - Add New Product", () => {
 
   beforeAll(async () => {
     let master = await request(app).post("/api/signin").send({
-      email: "master@example.com",
+      email: "master@gmail.com",
       user_password: "master12345678",
     });
     masterToken = master.body.token;
 
     let admin = await request(app).post("/api/signin").send({
-      email: "superman@example.com",
+      email: "superman@gmail.com",
       user_password: "clark12345678",
     });
     adminToken = admin.body.token;
 
     let client = await request(app).post("/api/signin").send({
-      email: "alice@example.com",
+      email: "alice@gmail.com",
       user_password: "alice12345678",
     });
     clientToken = client.body.token;

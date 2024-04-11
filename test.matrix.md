@@ -1,6 +1,6 @@
 # Matrice de tests
 
-### Authentication
+### Module Authentication
 
 | Fonctionnalité            | Scénario de test                             | Résultat Attendu                                                   |
 | ------------------------- | -------------------------------------------- | ------------------------------------------------------------------ |
@@ -12,7 +12,7 @@
 | Création d'utilisateur    | Rejet si un champ est manquant               | Retour d'une erreur indiquant que tous les champs sont requis      |
 | Création d'utilisateur    | Rejet si le type de donnée ne correspond pas | Retour d'une erreur spécifiant que le type de donnée est incorrect |
 
-### User
+### Module User
 
 | Fonctionnalité    | Scénario de test                                                   | MASTER                                     | ADMIN                                      | CLIENT                                     | Résultat Attendu                                       |
 | ----------------- | ------------------------------------------------------------------ | ------------------------------------------ | ------------------------------------------ | ------------------------------------------ | ------------------------------------------------------ |
@@ -34,7 +34,33 @@
 | Update password   | Rejet de la mise à jour si l'ancien mot de passe est incorrect     |                                            |                                            |                                            | Message d'erreur "Incorrect old password", réponse 400 |
 | Update password   | Application des exigences de longueur pour le nouveau mot de passe |                                            |                                            |                                            | Message d'erreur sur la longueur, réponse 400          |
 | Delete user       | ADMIN tente de supprimer un compte MASTER                          |                                            | **_<p style="text-align: center;">X</p>_** |                                            | Échec de la suppression, réponse 403                   |
-| Delete user       | MASTER supprime un compte CLIENT                                   | **_<p style="text-align: center;">X</p>_** |                                            |                                            | Suppression réussie, réponse 200                       |
-| Delete user       | ADMIN supprime un compte CLIENT                                    |                                            | **_<p style="text-align: center;">X</p>_** |                                            | Suppression réussie, réponse 200                       |
+| Delete user       | Supprime un compte CLIENT                                          | **_<p style="text-align: center;">X</p>_** | **_<p style="text-align: center;">X</p>_** |                                            | Suppression réussie, réponse 200                       |
 | Delete user       | CLIENT tente de supprimer un autre compte CLIENT                   |                                            |                                            | **_<p style="text-align: center;">X</p>_** | Échec de la suppression, réponse 403                   |
 | Delete user       | CLIENT supprime son propre compte                                  |                                            |                                            | **_<p style="text-align: center;">X</p>_** | Suppression réussie, réponse 200                       |
+
+### Module Reservation
+
+| Fonctionnalité     | Scénario de test                                       | MASTER                                     | ADMIN                                      | CLIENT                                     | Résultat Attendu                                                          |
+| ------------------ | ------------------------------------------------------ | ------------------------------------------ | ------------------------------------------ | ------------------------------------------ | ------------------------------------------------------------------------- |
+| Add reservation    | Création avec des données valides                      |                                            |                                            | **_<p style="text-align: center;">X</p>_** | Création réussie, réservation enregistrée avec succès, réponse 200        |
+| Add reservation    | Création échoue si des données sont manquantes         |                                            |                                            | **_<p style="text-align: center;">X</p>_** | Échec de la création, "Missing required reservation details", réponse 400 |
+| Add reservation    | Échec pour format de date invalide                     |                                            |                                            | **_<p style="text-align: center;">X</p>_** | Échec de la création, "Invalid date format", réponse 422                  |
+| Add reservation    | Échec pour format d'heure invalide                     |                                            |                                            | **_<p style="text-align: center;">X</p>_** | Échec de la création, "Invalid time format", réponse 422                  |
+| Add reservation    | Authentification requise pour créer                    |                                            |                                            | **_<p style="text-align: center;">X</p>_** | Échec de la création, "Token required", réponse 401                       |
+| Update reservation | Mise à jour par MASTER                                 | **_<p style="text-align: center;">X</p>_** |                                            |                                            | Mise à jour réussie, données de réservation actualisées, réponse 200      |
+| Update reservation | Mise à jour par ADMIN                                  |                                            | **_<p style="text-align: center;">X</p>_** |                                            | Mise à jour réussie, données de réservation actualisées, réponse 200      |
+| Update reservation | Mise à jour par le client qui a créé la réservation    |                                            |                                            | **_<p style="text-align: center;">X</p>_** | Mise à jour réussie, données de réservation actualisées, réponse 200      |
+| Update reservation | Tentative de mise à jour par un autre client           |                                            |                                            | **_<p style="text-align: center;">X</p>_** | Échec de la mise à jour, accès refusé, réponse 403                        |
+| Update reservation | Tentative de mise à jour d'une réservation inexistante |                                            | **_<p style="text-align: center;">X</p>_** | **_<p style="text-align: center;">X</p>_** | Échec de la mise à jour, "Reservation not found", réponse 404             |
+| Get reservations   | Accès aux réservations par l'Admin                     |                                            | **_<p style="text-align: center;">X</p>_** |                                            | Admin reçoit toutes les réservations, réponse 200                         |
+| Get reservations   | Accès aux réservations par le Master                   | **_<p style="text-align: center;">X</p>_** |                                            |                                            | Master reçoit toutes les réservations, réponse 200                        |
+| Get reservations   | Accès aux réservations par le Client                   |                                            |                                            | **_<p style="text-align: center;">X</p>_** | Client reçoit uniquement ses propres réservations, réponse 200            |
+
+### Module Table
+
+| Fonctionnalité | Scénario de test                           | MASTER                                     | ADMIN                                      | CLIENT                                     | Résultat Attendu                                         |
+| -------------- | ------------------------------------------ | ------------------------------------------ | ------------------------------------------ | ------------------------------------------ | -------------------------------------------------------- |
+| Add new table  | Tentative de création par un client        |                                            |                                            | **_<p style="text-align: center;">X</p>_** | Échec de la création, accès refusé, réponse 403          |
+| Add new table  | Création avec un nombre de sièges invalide | **_<p style="text-align: center;">X</p>_** | **_<p style="text-align: center;">X</p>_** |                                            | Échec de la création, "Invalid seats_count", réponse 400 |
+| Add new table  | Ajout d'une nouvelle table                 | **_<p style="text-align: center;">X</p>_** | **_<p style="text-align: center;">X</p>_** |                                            | Création réussie, retour de l'objet table, réponse 200   |
+| Get all tables | Accès à la liste des tables                | **_<p style="text-align: center;">X</p>_** | **_<p style="text-align: center;">X</p>_** | **_<p style="text-align: center;">X</p>_** | Reçoit la liste de toutes les tables, réponse 200        |

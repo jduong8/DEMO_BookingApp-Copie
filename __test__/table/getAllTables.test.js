@@ -8,19 +8,19 @@ describe("GET /api/tables - Get All Tables", () => {
     // Connexion en tant que client pour récupérer le token
     let client = await request(app)
       .post("/api/signin")
-      .send({ email: "david@example.com", user_password: "david12345678" });
+      .send({ email: "david@gmail.com", user_password: "david12345678" });
     clientToken = client.body.token;
 
     // Connexion en tant que client pour récupérer le token
     let admin = await request(app)
       .post("/api/signin")
-      .send({ email: "superman@example.com", user_password: "clark12345678" });
+      .send({ email: "superman@gmail.com", user_password: "clark12345678" });
     adminToken = admin.body.token;
 
     // Connexion en tant que client pour récupérer le token
     let master = await request(app)
       .post("/api/signin")
-      .send({ email: "master@example.com", user_password: "master12345678" });
+      .send({ email: "master@gmail.com", user_password: "master12345678" });
     masterToken = master.body.token;
   });
 

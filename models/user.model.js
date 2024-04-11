@@ -25,7 +25,7 @@ module.exports = (sequelize) => {
       },
       phone: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       user_password: {
         type: DataTypes.STRING,
