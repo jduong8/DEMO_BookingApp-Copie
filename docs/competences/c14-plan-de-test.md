@@ -16,9 +16,9 @@
 
 ## Matrice de Test
 
-| Tâche                                | Validée | Lien vers le fichier/ligne de code |
-| ------------------------------------ | :-----: | ---------------------------------- |
-| 🔜 Élaboration de la matrice de test |   ❌    |                                    |
+| Tâche                                | Validée | Lien vers le fichier/ligne de code                |
+| ------------------------------------ | :-----: | ------------------------------------------------- |
+| 🔜 Élaboration de la matrice de test |   ✅    | [Matrice de test](../../documents/test.matrix.md) |
 
 ## Tests
 
@@ -26,8 +26,8 @@
 
 | Tâche                                                 | Validée | Lien vers le fichier/ligne de code |
 | ----------------------------------------------------- | :-----: | ---------------------------------- |
-| Implémentation des tests unitaires avec Jest          |   🟠    |                                    |
-| Implémentation des tests d'intégration avec Supertest |   🟠    |                                    |
+| Implémentation des tests unitaires avec Jest          |   ✅    |                                    |
+| Implémentation des tests d'intégration avec Supertest |   ✅    |                                    |
 
 ### Tests Fonctionnels
 
@@ -40,7 +40,7 @@
 
 | Tâche                                        | Validée | Lien vers le fichier/ligne de code |
 | -------------------------------------------- | :-----: | ---------------------------------- |
-| 🔜 Établissement d'un plan de non régression |   ❌    |                                    |
+| 🔜 Établissement d'un plan de non régression |   🟠    |                                    |
 
 ## CI/CD
 

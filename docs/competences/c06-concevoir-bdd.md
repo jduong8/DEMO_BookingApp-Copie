@@ -12,6 +12,6 @@
 | ---------------------------------- | :-----: | ---------- |
 | Models nommés selon une norme      |   ✅    |            |
 | Schema physique de base de données |   ✅    |            |
-| Schema entite association          |   ❌    |            |
-| Diagramme de classe                |   ❌    |            |
+| Schema entite association          |   ✅    |            |
+| Diagramme de classe                |   ✅    |            |
 | Association implémentée            |   ✅    |            |

@@ -3,7 +3,7 @@ const {
   signUpValidationRules,
   signInValidationRules,
   validate,
-} = require("../middlewares/authenticationValidor.js");
+} = require("../middlewares/authenticationValidator.middleware.js");
 const express = require("express");
 const router = express.Router();
 

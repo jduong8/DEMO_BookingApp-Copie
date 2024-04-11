@@ -1,8 +1,8 @@
 # Atelier de réservation de restaurant.
 
-- [Voir brief](./BRIEF.md)
+- [Voir brief](./documents//BRIEF.md)
 
-- [Commment l'utiliser](SETUP.md)
+- [Commment utiliser ce projet](./documents/SETUP.md)
 
 ## Description
 
@@ -16,7 +16,11 @@ Ce projet comporte la création d'un serveur NodeJS:
 
 - Implémentation des Tests Unitaires.
 
-- Mise en place d'une Architecture MVC (Modèle View Controller)
+- Mise en place d'une Architecture MVC (Modèle View Controller).
+
+- Mise en place d'une matrice de test sous format Markdown.
+
+- Mise en place d'une Documentation de l'API avec Swagger.
 
 ## Aperçu de l'arborescence
 
