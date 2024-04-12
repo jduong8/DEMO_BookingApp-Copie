@@ -11,7 +11,7 @@ describe("POST /api/user/password - Update Password", () => {
       firstname: "TestUser",
       lastname: "PasswordChange",
       email: "testpasswordchange@example.com",
-      phone: "1234567890",
+      phone: "0623456789",
       user_password: "initialPassword123",
     };
 

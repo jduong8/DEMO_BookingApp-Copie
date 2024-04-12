@@ -18,7 +18,7 @@ describe("POST /api/users", () => {
       firstname: "John",
       lastname: "Test",
       email: "testuser@gmail.com",
-      phone: "0123456789",
+      phone: "0623456789",
       user_password: "Test1234",
     };
 
@@ -43,7 +43,7 @@ describe("POST /api/users", () => {
       firstname: "John",
       lastname: "Test",
       email: "invalid-email",
-      phone: "0123456789",
+      phone: "0623456789",
       user_password: "Test1234",
     };
 
@@ -59,7 +59,7 @@ describe("POST /api/users", () => {
     const userData = {
       firstname: "John",
       lastname: "Test",
-      phone: "0123456789",
+      phone: "0623456789",
       user_password: "Test1234",
     };
 
@@ -75,7 +75,7 @@ describe("POST /api/users", () => {
       firstname: 12345,
       lastname: "Test",
       email: "testuser@gmail.com",
-      phone: "0123456789",
+      phone: "0623456789",
       user_password: "Test1234",
     };
 

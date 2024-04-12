@@ -28,7 +28,7 @@ describe("DELETE /api/users/:id - Delete User", () => {
       firstname: "Client",
       lastname: "John",
       email: "client1@example.com",
-      phone: "1234567890",
+      phone: "0623456789",
       user_password: "client1234",
     };
     let client1Res = await request(app).post("/api/signup").send(client1);
@@ -44,7 +44,7 @@ describe("DELETE /api/users/:id - Delete User", () => {
       firstname: "Client",
       lastname: "User",
       email: "client2@example.com",
-      phone: "0987654321",
+      phone: "0623456789",
       user_password: "client21234",
     };
     let client2Res = await request(app).post("/api/signup").send(client2);
@@ -60,7 +60,7 @@ describe("DELETE /api/users/:id - Delete User", () => {
       firstname: "Client",
       lastname: "User",
       email: "client3@example.com",
-      phone: "0987654321",
+      phone: "0623456789",
       user_password: "client21234",
     };
     let client3Res = await request(app).post("/api/signup").send(client3);

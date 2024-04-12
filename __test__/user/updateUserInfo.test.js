@@ -22,9 +22,9 @@ describe("PUT /api/users/:id/update - Update User Information", () => {
   it("should allow a user to update their own information", async () => {
     const updatedData = {
       firstname: "AliceUpdated",
-      lastname: "SmithUpdated",
+      lastname: "Smith",
       email: "alice@gmail.com",
-      phone: "9876543210",
+      phone: "0623456789",
     };
 
     await request(app)
@@ -39,7 +39,7 @@ describe("PUT /api/users/:id/update - Update User Information", () => {
       firstname: "BobUpdated",
       lastname: "JonesUpdated",
       email: "bob@gmail.com",
-      phone: "9876501234",
+      phone: "0623456789",
     };
 
     await request(app)
@@ -55,7 +55,7 @@ describe("PUT /api/users/:id/update - Update User Information", () => {
       firstname: "NonExistent",
       lastname: "User",
       email: "nonexistent@example.com",
-      phone: "0000000000",
+      phone: "0623456789",
     };
 
     await request(app)
@@ -70,7 +70,7 @@ describe("PUT /api/users/:id/update - Update User Information", () => {
       firstname: "AliceSecondUpdate",
       lastname: "SmithSecondUpdate",
       email: "alicesecondupdate@example.com",
-      phone: "9876543211",
+      phone: "0623456789",
     };
 
     await request(app)
