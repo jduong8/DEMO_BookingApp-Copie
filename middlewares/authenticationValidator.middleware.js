@@ -8,7 +8,7 @@ exports.signUpValidationRules = () => {
       .isEmail()
       .withMessage("L'email n'est pas au bon format"),
 
-    body("user_password")
+    body("password")
       .isStrongPassword({
         minLength: 6,
         minLowercase: 1,
@@ -48,7 +48,7 @@ exports.signInValidationRules = () => {
   return [
     body("email").isEmail().withMessage("Le format de l'email est incorrect"),
 
-    body("user_password")
+    body("password")
       .isLength({ min: 5 })
       .withMessage("Le mot de passe doit contenir au moins 5 caractères"),
   ];

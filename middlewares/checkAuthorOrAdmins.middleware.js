@@ -18,36 +18,32 @@ const checkAuthorOrAdminMiddleware =
         modelName === "User" ? resource.id : resource.userId;
 
       // Autoriser le MASTER à effectuer n'importe quelle action.
-      if (currentUser.user_role === USER_ROLE.MASTER) {
+      if (currentUser.role === USER_ROLE.MASTER) {
         return next();
       }
 
       // Autoriser l'ADMIN à se gérer lui-même ou à gérer les CLIENTs uniquement,
       // mais pas les autres ADMINs ou le MASTER.
-      if (currentUser.user_role === USER_ROLE.ADMIN) {
-        if (resource.user_role === USER_ROLE.MASTER) {
-          return res
-            .status(403)
-            .json({
-              message: "ADMIN - Permission denied for managing MASTER.",
-            });
+      if (currentUser.role === USER_ROLE.ADMIN) {
+        if (resource.role === USER_ROLE.MASTER) {
+          return res.status(403).json({
+            message: "ADMIN - Permission denied for managing MASTER.",
+          });
         }
         if (
-          resource.user_role === USER_ROLE.ADMIN &&
+          resource.role === USER_ROLE.ADMIN &&
           currentUser.id !== associatedUserId
         ) {
-          return res
-            .status(403)
-            .json({
-              message: "ADMIN - Permission denied for managing other ADMIN.",
-            });
+          return res.status(403).json({
+            message: "ADMIN - Permission denied for managing other ADMIN.",
+          });
         }
         return next();
       }
 
       // Autoriser le CLIENT à se gérer lui-même uniquement.
       if (
-        currentUser.user_role === USER_ROLE.CLIENT &&
+        currentUser.role === USER_ROLE.CLIENT &&
         currentUser.id === associatedUserId
       ) {
         return next();

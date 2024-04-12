@@ -1,60 +1,21 @@
-require("dotenv").config();
-const { Op } = require("sequelize");
-const db = require("../db.js");
-const User = db.user;
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const SECRET_KEY = process.env.SECRET_KEY;
 const USER_ROLE = require("../models/userRole.model.js");
+const UserService = require("../services/user.service");
+const RoleService = require("../services/role.service");
+const userService = new UserService();
+const roleService = new RoleService();
 
-/* GET */
-exports.getAllUsers = (req, res) => {
-  let whereCondition = {};
-
-  // Liste des attributs à exclure dans la réponse
-  const attributesToExclude = ["user_password"];
-
-  // Un client n'est pas autorisé à récupérer la liste de tous les utilisateurs
-  switch (req.user.user_role) {
-    case USER_ROLE.ADMIN:
-      whereCondition.user_role = USER_ROLE.CLIENT;
-      break;
-    case USER_ROLE.MASTER:
-      whereCondition.user_role = {
-        [Op.in]: [USER_ROLE.ADMIN, USER_ROLE.CLIENT],
-      };
-      whereCondition.id = { [Op.ne]: req.user.id }; // On exclue le Super Admin lui même
-      break;
-    case USER_ROLE.CLIENT:
-      return res.status(403).json({ message: "Access denied" });
-    default:
-      return res.status(403).json({ message: "Invalid user role" });
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await userService.getAllUsers(req.user.role, req.user.id);
+    res.send(users);
+  } catch (error) {
+    res.status(403).json({ error: error.message });
   }
-
-  User.findAll({
-    where: whereCondition,
-    attributes: { exclude: attributesToExclude },
-  })
-    .then((users) => {
-      res.send(users);
-    })
-    .catch((error) => {
-      res.status(500).send({
-        message: error.message || "Some error occurred while retrieving users.",
-      });
-    });
 };
 
 exports.getUserInfo = async (req, res, next) => {
   try {
-    // Récupérer l'ID utilisateur du token JWT
-    const userId = req.user.id;
-
-    // Trouver l'utilisateur dans la base de données à l'aide de l'ID
-    const user = await User.findByPk(userId);
-
-    // Si l'utilisateur n'existe pas, on renvoie une erreur 404
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const user = await userService.getUserById(req.user.id);
 
     // Sinon, on renvoie les informations de l'utilisateur (sans le mot de passe)
     res.status(200).json({
@@ -63,82 +24,23 @@ exports.getUserInfo = async (req, res, next) => {
       lastname: user.lastname,
       email: user.email,
       phone: user.phone,
-      user_role: user.user_role,
+      role: user.role,
     });
   } catch (error) {
     next(error);
   }
 };
 
-/* POST */
-exports.addSuperAdmin = async (req, res) => {
-  try {
-    // Valider les données reçues
-    const { firstname, lastname, email, phone, user_password } = req.body;
-    if (!firstname || !lastname || !email || !phone || !user_password) {
-      return res.status(400).json({ message: "Tous les champs sont requis" });
-    }
-
-    // Hashage du mot de passe
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(user_password, salt);
-
-    // Création du super_admin
-    const superAdmin = await User.create({
-      user_role: USER_ROLE.MASTER,
-      firstname,
-      lastname,
-      email,
-      phone,
-      user_password: hashedPassword,
-    });
-
-    // Générer un token JWT
-    const payload = {
-      id: superAdmin.id,
-      email: superAdmin.email,
-      user_role: superAdmin.user_role,
-    };
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: 60 * 60 * 24 });
-
-    // Renvoyer le super_admin créé (sans le mot de passe) et le token
-    res.status(200).json({
-      message: "Super Admin créé",
-      user: {
-        id: superAdmin.id,
-        firstname: superAdmin.firstname,
-        lastname: superAdmin.lastname,
-        email: superAdmin.email,
-        phone: superAdmin.phone,
-        user_role: superAdmin.user_role,
-      },
-      token,
-    });
-  } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la création du superAdmin" });
-  }
-};
-
-exports.updateUserRole = async (req, res) => {
-  const { userId } = req.params;
+exports.updateUserRole = async (req, res, next) => {
+  const userId = parseInt(req.params.userId, 10);
   const newRole = req.path.includes("/admin")
     ? USER_ROLE.ADMIN
     : USER_ROLE.CLIENT;
 
   try {
-    // Recherche de l'utilisateur à mettre à jour
-    const user = await User.findByPk(userId);
+    await userService.getUserById(userId);
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found." });
-    }
-
-    // Mise à jour du rôle de l'utilisateur
-    await user.update({ user_role: newRole });
-
+    const user = await roleService.updateRole(userId, newRole);
     // Renvoyer une réponse de succès
     res.status(200).json({
       message: `User role updated to ${newRole} successfully.`,
@@ -148,35 +50,20 @@ exports.updateUserRole = async (req, res) => {
         lastname: user.lastname,
         email: user.email,
         phone: user.phone,
-        user_role: user.user_role,
+        role: user.role,
       },
     });
   } catch (error) {
-    console.error("Error updating user role:", error);
-    res.status(500).json({ message: "Error updating user role" });
+    res.status(404).json({ message: error.message });
   }
 };
 
 /* PUT */
 exports.updateUserInfo = async (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+
   try {
-    const userId = parseInt(req.params.id, 10);
-    const currentUser = req.user;
-
-    // Vérifier si currentUser est défini
-    if (!currentUser) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const userToUpdate = await User.findByPk(userId);
-    if (!userToUpdate)
-      return res.status(404).json({ message: "User not found" });
-
-    if (currentUser.id !== userToUpdate.id) {
-      return res
-        .status(403)
-        .json({ message: "Cannot update: Permission denied" });
-    }
+    await userService.getUserById(userId);
 
     const updatedData = {
       firstname: req.body.firstname,
@@ -185,72 +72,39 @@ exports.updateUserInfo = async (req, res) => {
       phone: req.body.phone,
     };
 
-    await User.update(updatedData, {
-      where: {
-        id: userId,
+    const updatedUser = await userService.updateUserInfo(userId, updatedData);
+    res.status(200).json({
+      message: `User updated successfully`,
+      user: {
+        id: updatedUser.id,
+        firstname: updatedUser.firstname,
+        lastname: updatedUser.lastname,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        role: updatedUser.role,
       },
     });
-
-    res.status(200).send({
-      message: `User updated for userId: ${userId}`,
-    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Error updating user",
-      details: error.message,
-    });
+    next(error);
   }
 };
 
 exports.updatePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
   try {
-    const userId = req.user.id;
-
-    // On va rechercher l'utilisateur dans la base de données
-    const user = await User.findByPk(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    // On récupère l'ancien mot de passe et le nouveau mot de passe du corps de la requête
-    const { oldPassword, newPassword } = req.body;
-
-    // On vérifie si l'ancien mot de passe fourni est correct
-    const validPassword = await bcrypt.compare(oldPassword, user.user_password);
-    if (!validPassword) {
-      return res.status(400).json({ message: "Incorrect old password" });
-    }
-
-    // On vérifie si le nouveau mot de passe est valide (non vide, longueur suffisante, etc.)
-    if (!newPassword || newPassword.trim().length < 8) {
-      return res
-        .status(400)
-        .json({ message: "New password must be at least 8 characters long" });
-    }
-
-    // Hashage du nouveau mot de passe et mettre à jour dans la base de données
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-    user.user_password = hashedPassword;
-    await user.save();
-
+    await userService.updatePassword(req.user.id, oldPassword, newPassword);
     res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error updating password" });
+    res.status(400).json({ message: error.message });
   }
 };
 
 /* DELETE */
 exports.deleteUser = async (req, res) => {
-  const userId = req.params.id;
-
-  User.destroy({
-    where: {
-      id: userId,
-    },
-  }).then(() => {
-    res.status(200).send({
-      message: `User deleted for userId: ${userId}`,
-    });
-  });
+  try {
+    await userService.deleteUser(req.params.id);
+    res.status(200).send({ message: "User deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };

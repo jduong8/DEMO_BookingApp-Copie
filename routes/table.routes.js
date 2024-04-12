@@ -7,8 +7,19 @@ const express = require("express");
 const router = express.Router();
 
 // Get all tables
-router.get("/tables/all", verifyJWT, tableController.getAllTables);
+router.get(
+  "/tables/all",
+  verifyJWT,
+  checkRole([USER_ROLE.ADMIN, USER_ROLE.MASTER]),
+  tableController.getAllTables,
+);
 
+router.get(
+  "/tables/:id/detail",
+  verifyJWT,
+  checkRole([USER_ROLE.ADMIN, USER_ROLE.MASTER]),
+  tableController.getOneTable,
+);
 // Create new table
 router.post(
   "/table/create",

@@ -14,6 +14,14 @@ router.get(
   orderController.getAllOrder,
 );
 
+//Get Order detail for table
+router.get(
+  "tables/:tableId/orders/:orderId/detail",
+  verifyJWT,
+  checkRole([USER_ROLE.ADMIN, USER_ROLE.MASTER]),
+  orderController.getOrderDetailForTable,
+);
+
 // Get orders for table
 router.get(
   "/tables/:tableId/orders",

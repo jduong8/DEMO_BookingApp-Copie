@@ -1,10 +1,8 @@
-require("dotenv").config();
 const config = require("./config/config");
-
-const environment = process.env.NODE_ENV || "development";
+const environment = process.env.NODE_ENV;
 const dbConfig = config[environment];
+const { Sequelize, DataTypes } = require("sequelize");
 
-const { Sequelize } = require("sequelize");
 const sequelize = new Sequelize(
   dbConfig.database,
   dbConfig.username,
@@ -15,57 +13,38 @@ const sequelize = new Sequelize(
     logging: false,
   },
 );
+
 const db = {};
 
 // Importation les modèles
-db.user = require("./models/user.model.js")(sequelize);
-db.table = require("./models/table.model.js")(sequelize);
-db.reservation = require("./models/reservation.model.js")(sequelize);
-db.product = require("./models/product.model.js")(sequelize);
-db.order = require("./models/order.model.js")(sequelize);
+db.User = require("./models/user.model.js")(sequelize, DataTypes);
+db.Table = require("./models/table.model.js")(sequelize, DataTypes);
+db.Reservation = require("./models/reservation.model.js")(sequelize, DataTypes);
+db.Product = require("./models/product.model.js")(sequelize, DataTypes);
+db.Order = require("./models/order.model.js")(sequelize, DataTypes);
 
-// Définition des associations 1:N
-db.user.hasMany(db.reservation, {
-  onDelete: "CASCADE",
-  foreignKey: "userId",
+Object.keys(db).forEach((modelName) => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
 });
 
-db.table.hasMany(db.reservation, {
-  onDelete: "CASCADE",
-  foreignKey: "tableId",
-});
+db.sequelize = sequelize;
 
-db.product.hasMany(db.order, {
-  onDelete: "CASCADE",
-  foreignKey: "productId",
-});
+const initializeDatabase = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log("Connection has been established successfully.");
 
-db.table.hasMany(db.order, {
-  onDelete: "CASCADE",
-  foreignKey: "tableId",
-});
+    if (environment === "development") {
+      await sequelize.sync({ force: true });
+      console.log("Les tables ont été créées !");
+    }
+  } catch (error) {
+    console.error("Unable to connect to the database:", error);
+  }
+};
 
-db.order.belongsTo(db.product, {
-  foreignKey: "productId",
-  as: "product",
-});
-
-// Synchronisation avec la base de données
-sequelize
-  .sync({ force: false })
-  .then(() => {
-    console.log("Les tables ont été créées !");
-  })
-  .catch((error) => {
-    console.error("Erreur lors de la création des tables :", error);
-  });
-
-// try {
-//   sequelize.authenticate().then(() => {
-//     console.log('Connection has been established successfully.');
-//   })
-// } catch (error) {
-//   console.error('Unable to connect to the database:', error);
-// }
+initializeDatabase();
 
 module.exports = db;

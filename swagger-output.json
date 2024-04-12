@@ -55,16 +55,16 @@
                 "number_of_customers": {
                   "example": "any"
                 },
-                "reservation_date": {
+                "date": {
                   "example": "any"
                 },
-                "reservation_time": {
+                "time": {
                   "example": "any"
                 },
-                "reservation_name": {
+                "name": {
                   "example": "any"
                 },
-                "reservation_note": {
+                "description": {
                   "example": "any"
                 }
               }
@@ -112,16 +112,16 @@
                 "number_of_customers": {
                   "example": "any"
                 },
-                "reservation_date": {
+                "date": {
                   "example": "any"
                 },
-                "reservation_time": {
+                "time": {
                   "example": "any"
                 },
-                "reservation_name": {
+                "name": {
                   "example": "any"
                 },
-                "reservation_note": {
+                "description": {
                   "example": "any"
                 }
               }
@@ -347,7 +347,7 @@
                 "phone": {
                   "example": "any"
                 },
-                "user_password": {
+                "password": {
                   "example": "any"
                 }
               }
@@ -566,7 +566,7 @@
                 "phone": {
                   "example": "any"
                 },
-                "user_password": {
+                "password": {
                   "example": "any"
                 }
               }
@@ -603,7 +603,7 @@
                 "email": {
                   "example": "any"
                 },
-                "user_password": {
+                "password": {
                   "example": "any"
                 }
               }

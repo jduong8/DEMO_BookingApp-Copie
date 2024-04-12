@@ -1,13 +1,11 @@
-const { DataTypes } = require("sequelize");
 const USER_ROLE = require("./userRole.model.js");
 
-module.exports = (sequelize) => {
+module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
     "User",
     {
-      user_role: {
-        type: DataTypes.ENUM,
-        values: [USER_ROLE.MASTER, USER_ROLE.ADMIN, USER_ROLE.CLIENT],
+      role: {
+        type: DataTypes.ENUM(...Object.values(USER_ROLE)),
         allowNull: false,
       },
       firstname: {
@@ -18,21 +16,30 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      phone: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
       },
-      phone: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      user_password: {
+      password: {
         type: DataTypes.STRING,
         allowNull: false,
       },
     },
     {},
   );
+
+  User.associate = (models) => {
+    User.hasMany(models.Reservation, {
+      onDelete: "CASCADE",
+      foreignKey: "userId",
+      as: "reservation",
+    });
+  };
+
   return User;
 };

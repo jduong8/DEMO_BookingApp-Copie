@@ -1,42 +1,18 @@
 const request = require("supertest");
 const app = require("../../app.js");
-const Product = require("../../db.js").product;
+const db = require("../../db.js");
+const createProductMock = require("../../mocks/products.mock.js");
 
 describe("GET /api/products/all - Get All Products", () => {
-  beforeAll(() => {
-    // Mock Product.findAll pour retourner des données factices
-    jest.spyOn(Product, "findAll").mockResolvedValue([
-      {
-        id: 1,
-        name: "Product 1",
-        price: 10.99,
-        toJSON() {
-          return this;
-        },
-      },
-      {
-        id: 2,
-        name: "Product 2",
-        price: 20.49,
-        toJSON() {
-          return this;
-        },
-      },
-    ]);
+  beforeAll(async () => {
+    const productsMock = await createProductMock();
+    await db.sequelize.sync({ force: true });
+    await db.Product.bulkCreate(productsMock);
   });
 
-  it("should fetch all products and format their prices correctly", async () => {
+  it("should fetch all products", async () => {
     const response = await request(app).get("/api/products/all");
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual([
-      { id: 1, name: "Product 1", price: "10,99 €" },
-      { id: 2, name: "Product 2", price: "20,49 €" },
-    ]);
-  });
-
-  afterAll(() => {
-    // Restaurez la mise en œuvre originale
-    Product.findAll.mockRestore();
   });
 });

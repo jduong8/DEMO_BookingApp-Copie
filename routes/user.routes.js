@@ -20,9 +20,6 @@ router.post(
   userController.updatePassword,
 );
 
-// Add Super Admin
-router.post("/user/generate/superAdmin", userController.addSuperAdmin);
-
 // Update User role
 router.put(
   "/users/:userId/role/admin",
@@ -38,13 +35,18 @@ router.put(
 );
 
 // Update user informations
-router.put("/users/:id/update", verifyJWT, userController.updateUserInfo);
+router.put(
+  "/users/:id/update",
+  verifyJWT,
+  checkAuthorOrAdmin(db.User, "User"),
+  userController.updateUserInfo,
+);
 
 // DELETE user
 router.delete(
   "/users/:id/delete",
   verifyJWT,
-  checkAuthorOrAdmin(db.user, "User"),
+  checkAuthorOrAdmin(db.User, "User"),
   userController.deleteUser,
 );
 

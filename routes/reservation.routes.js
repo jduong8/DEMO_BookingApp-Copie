@@ -16,6 +16,12 @@ router.get(
   reservationController.getAllReservations,
 );
 
+router.get(
+  "/reservations/:id/detail",
+  checkRole([USER_ROLE.ADMIN, USER_ROLE.MASTER, USER_ROLE.CLIENT]),
+  reservationController.getReservationDetail,
+);
+
 // Create new reservation
 router.post(
   "/reservation/create",
@@ -27,7 +33,7 @@ router.post(
 router.put(
   "/reservations/:id/info/update",
   verifyJWT,
-  checkAuthorOrAdmin(db.reservation, "Reservation"),
+  checkAuthorOrAdmin(db.Reservation, "Reservation"),
   reservationController.updateReservation,
 );
 

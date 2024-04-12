@@ -1,6 +1,4 @@
-const { DataTypes } = require("sequelize");
-
-module.exports = (sequelize) => {
+module.exports = (sequelize, DataTypes) => {
   const Table = sequelize.define(
     "Table",
     {
@@ -19,5 +17,19 @@ module.exports = (sequelize) => {
     },
     {},
   );
+
+  Table.associate = (models) => {
+    Table.hasMany(models.Reservation, {
+      onDelete: "CASCADE",
+      foreignKey: "tableId",
+      as: "reservation",
+    });
+    Table.hasMany(models.Order, {
+      onDelete: "CASCADE",
+      foreignKey: "tableId",
+      as: "order",
+    });
+  };
+
   return Table;
 };
