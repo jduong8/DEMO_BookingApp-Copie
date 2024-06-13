@@ -2,7 +2,7 @@
 
 ### Vérifications :
 
-- [x] Modèles créés (rooms, user, spot, réservation)
+- [x] Modèles créés (user, reservation, table, product, order)
 - [x] Routes POST, GET, PUT, DELETE pour chaque entité
 - [x] Seeds pour toutes les entités
 - [x] Jest et super test implémentés
@@ -13,7 +13,7 @@
 - [x] ESLINT / Prettier (Commande : npm run lint)
 - [x] Middleware d'admin (gestion des accès utilisateurs)
 - [x] Rôles utilisateurs modifiables par les admins
-- [x] Admins : accès complet aux spots, rooms, users, réservations
+- [x] Admins : accès complet aux users, réservations, tables, produits, commandes
 - [x] Utilisateurs : modification de leurs données personnelles et visualisation de leurs réservations
 - [x] Fonctionnalité de réinitialisation du mot de passe
 
@@ -27,8 +27,8 @@
 
 ### Bonus
 
-- [x] Relations entre tables (User ↔ réservation, réservation ↔ spot, spot ↔ réservation)
-- [ ] Swagger pour documentation API
+- [x] Relations entre tables (user -> reservation, réservation <--> table, table <--> order, order <--> product...)
+- [x] Swagger pour documentation API
 - [x] Commitizen et Husky pour gestion de Git
 - [ ] Socket.io pour gestion en temps réel
 - [x] Front-end HTML/CSS/JS avec fetch pour requêtes API
