@@ -46,6 +46,6 @@
 
 | Tâche                                   | Validée | Lien vers le fichier/ligne de code |
 | --------------------------------------- | :-----: | ---------------------------------- |
-| 🔜 Mise en place d'une pipeline CI/CD   |   ❌    |                                    |
-| 🔜 Automatisation des tests dans la CI  |   ❌    |                                    |
+| 🔜 Mise en place d'une pipeline CI/CD   |   ✅    |                                    |
+| 🔜 Automatisation des tests dans la CI  |   ✅    |                                    |
 | 🔜 Configuration du déploiement continu |   ❌    |                                    |
