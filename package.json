@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node --watch ./bin/www",
     "swagger": "node ./swagger.js",
-    "test": "NODE_ENV=test jest allTests.test.js",
+    "test": "NODE_ENV=test jest --detectOpenHandles allTests.test.js",
     "prettier": "npx prettier . --write",
     "prepare": "husky install"
   },
@@ -16,7 +16,8 @@
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "dotenv": "^16.3.1",
-    "express": "~4.16.1",
+    "express": "^4.19.2",
+    "express-validator": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "~1.9.1",
     "nodemailer": "^6.9.8",
