@@ -1,22 +1,29 @@
 const request = require("supertest");
 const app = require("../../app.js");
+const db = require("../../db.js");
+const { createClientMock } = require("../../mocks/users.mock.js");
 
-describe("PUT /api/users/:id/update - Update User Information", () => {
+describe("User: PUT - Update User Information", () => {
   let aliceToken, bobToken;
-  let aliceId = 3;
+  let aliceId;
 
   beforeAll(async () => {
-    let res = await request(app).post("/api/signin").send({
-      email: "alice@gmail.com",
-      user_password: "alice12345678",
-    });
-    aliceToken = res.body.token;
+    const clientsMock = await createClientMock();
+    await db.sequelize.sync({ force: true });
+    const clients = await db.User.bulkCreate(clientsMock);
 
-    res = await request(app).post("/api/signin").send({
-      email: "bob@gmail.com",
-      user_password: "bob12345678",
+    const alice = await request(app).post("/api/signin").send({
+      email: "alice@gmail.com",
+      password: "alice12345678",
     });
-    bobToken = res.body.token;
+    aliceToken = alice.body.token;
+    aliceId = clients[0].id;
+
+    const bob = await request(app).post("/api/signin").send({
+      email: "bob@gmail.com",
+      password: "bob12345678",
+    });
+    bobToken = bob.body.token;
   });
 
   it("should allow a user to update their own information", async () => {
@@ -24,7 +31,7 @@ describe("PUT /api/users/:id/update - Update User Information", () => {
       firstname: "AliceUpdated",
       lastname: "Smith",
       email: "alice@gmail.com",
-      phone: "0623456789",
+      phone: "0612345678",
     };
 
     await request(app)
@@ -39,7 +46,7 @@ describe("PUT /api/users/:id/update - Update User Information", () => {
       firstname: "BobUpdated",
       lastname: "JonesUpdated",
       email: "bob@gmail.com",
-      phone: "0623456789",
+      phone: "0612345678",
     };
 
     await request(app)
@@ -55,7 +62,7 @@ describe("PUT /api/users/:id/update - Update User Information", () => {
       firstname: "NonExistent",
       lastname: "User",
       email: "nonexistent@example.com",
-      phone: "0623456789",
+      phone: "0612345678",
     };
 
     await request(app)
@@ -70,7 +77,7 @@ describe("PUT /api/users/:id/update - Update User Information", () => {
       firstname: "AliceSecondUpdate",
       lastname: "SmithSecondUpdate",
       email: "alicesecondupdate@example.com",
-      phone: "0623456789",
+      phone: "0612345678",
     };
 
     await request(app)

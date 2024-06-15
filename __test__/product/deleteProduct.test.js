@@ -1,36 +1,41 @@
 const request = require("supertest");
 const app = require("../../app.js");
-const Product = require("../../db.js").product;
-const CATEGORY = require("../../models/category.model.js");
+const db = require("../../db.js");
+const {
+  createClientMock,
+  createAdminMock,
+} = require("../../mocks/users.mock.js");
+const createProductMock = require("../../mocks/products.mock.js");
 
-describe("DELETE /api/products/delete/:id - Delete Product", () => {
+describe("Product: DELETE - Delete Product", () => {
   let masterToken, adminToken, clientToken, productToDeleteId;
 
   beforeAll(async () => {
-    // Créer un produit pour le test
-    const product = await Product.create({
-      name: "Product to Delete",
-      description: "This product will be deleted",
-      price: 19.99,
-      category: CATEGORY.DESSERT,
-    });
-    productToDeleteId = product.id;
+    const clientsMock = await createClientMock();
+    const adminsMock = await createAdminMock();
+    const productsMock = await createProductMock();
+    await db.sequelize.sync({ force: true });
+    await db.User.bulkCreate(clientsMock);
+    await db.User.bulkCreate(adminsMock);
+    const products = await db.Product.bulkCreate(productsMock);
+
+    productToDeleteId = products[0].id;
 
     const master = await request(app).post("/api/signin").send({
       email: "master@gmail.com",
-      user_password: "master12345678",
+      password: "master12345678",
     });
     masterToken = master.body.token;
 
     const admin = await request(app).post("/api/signin").send({
       email: "superman@gmail.com",
-      user_password: "clark12345678",
+      password: "clark12345678",
     });
     adminToken = admin.body.token;
 
     const client = await request(app).post("/api/signin").send({
       email: "alice@gmail.com",
-      user_password: "alice12345678",
+      password: "alice12345678",
     });
     clientToken = client.body.token;
   });
@@ -52,7 +57,6 @@ describe("DELETE /api/products/delete/:id - Delete Product", () => {
   });
 
   it("should return a 404 error if the product does not exist", async () => {
-    // Tentez de supprimer à nouveau le même produit, ce qui devrait échouer puisqu'il n'existe plus
     await request(app)
       .delete(`/api/products/delete/${productToDeleteId}`)
       .set("Authorization", `${adminToken}`)

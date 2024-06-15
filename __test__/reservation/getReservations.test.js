@@ -1,28 +1,39 @@
 const request = require("supertest");
 const app = require("../../app.js");
+const db = require("../../db.js");
+const {
+  createClientMock,
+  createAdminMock,
+} = require("../../mocks/users.mock.js");
 
-describe("GET /api/reservations/all", () => {
-  let adminToken, superAdminToken, clientToken;
+describe("Reservation: GET - Retrieve all reservations", () => {
+  let adminToken, masterToken, clientToken;
 
   // Connexion pour les différents rôles
   beforeAll(async () => {
+    const clients = await createClientMock();
+    const admins = await createAdminMock();
+    await db.sequelize.sync({ force: true });
+    await db.User.bulkCreate(clients);
+    await db.User.bulkCreate(admins);
+
     // Connexion en tant qu'Admin
-    let res = await request(app)
+    const admin = await request(app)
       .post("/api/signin")
-      .send({ email: "superman@gmail.com", user_password: "clark12345678" });
-    adminToken = res.body.token;
+      .send({ email: "superman@gmail.com", password: "clark12345678" });
+    adminToken = admin.body.token;
 
     // Connexion en tant que Super_Admin
-    res = await request(app)
+    const master = await request(app)
       .post("/api/signin")
-      .send({ email: "master@gmail.com", user_password: "master12345678" });
-    superAdminToken = res.body.token;
+      .send({ email: "master@gmail.com", password: "master12345678" });
+    masterToken = master.body.token;
 
     // Connexion en tant que Client
-    res = await request(app)
+    const client = await request(app)
       .post("/api/signin")
-      .send({ email: "alice@gmail.com", user_password: "alice12345678" });
-    clientToken = res.body.token;
+      .send({ email: "alice@gmail.com", password: "alice12345678" });
+    clientToken = client.body.token;
   });
 
   it("should allow an Admin to retrieve all reservations", async () => {
@@ -39,7 +50,7 @@ describe("GET /api/reservations/all", () => {
   it("should allow a Super Admin to retrieve all reservations", async () => {
     const res = await request(app)
       .get("/api/reservations/all")
-      .set("Authorization", `${superAdminToken}`)
+      .set("Authorization", `${masterToken}`)
       .expect("Content-Type", /json/)
       .expect(200);
 

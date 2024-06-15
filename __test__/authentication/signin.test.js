@@ -1,16 +1,21 @@
 const request = require("supertest");
 const app = require("../../app.js");
 const db = require("../../db.js");
-const User = db.user;
-const bcrypt = require("bcrypt");
+const { createClientMock } = require("../../mocks/users.mock.js");
 
-describe("POST /api/signin", () => {
-  it("should return a token for valid login credentials", async () => {
+describe("Authentication: POST Login", () => {
+  beforeAll(async () => {
+    const clients = await createClientMock();
+    await db.sequelize.sync({ force: true });
+    await db.User.bulkCreate(clients);
+  });
+
+  it("should return a token", async () => {
     const res = await request(app)
       .post("/api/signin")
       .send({
         email: "alice@gmail.com",
-        user_password: "alice12345678",
+        password: "alice12345678",
       })
       .expect(200);
 
@@ -22,8 +27,8 @@ describe("POST /api/signin", () => {
     const res = await request(app)
       .post("/api/signin")
       .send({
-        email: "testuser@example.com",
-        user_password: "wrongpassword",
+        email: "alice@gmail.com",
+        password: "wrongpassword",
       })
       .expect(400);
 
@@ -35,7 +40,7 @@ describe("POST /api/signin", () => {
       .post("/api/signin")
       .send({
         email: "nonexistent@example.com",
-        user_password: "testpassword",
+        password: "testpassword",
       })
       .expect(400);
 

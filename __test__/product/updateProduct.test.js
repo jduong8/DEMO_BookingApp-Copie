@@ -1,38 +1,44 @@
 const request = require("supertest");
 const app = require("../../app.js");
 const CATEGORY = require("../../models/category.model.js");
-const Product = require("../../db.js").product;
+const db = require("../../db.js");
+const {
+  createClientMock,
+  createAdminMock,
+} = require("../../mocks/users.mock.js");
+const createProductMock = require("../../mocks/products.mock.js");
 
 describe("PUT /api/products/update/:id - Update Product", () => {
   let adminToken, masterToken, clientToken, productId;
 
   beforeAll(async () => {
+    const clientsMock = await createClientMock();
+    const adminsMock = await createAdminMock();
+    const productsMock = await createProductMock();
+    await db.sequelize.sync({ force: true });
+    await db.User.bulkCreate(clientsMock);
+    await db.User.bulkCreate(adminsMock);
+    const products = await db.Product.bulkCreate(productsMock);
+
     let master = await request(app).post("/api/signin").send({
       email: "master@gmail.com",
-      user_password: "master12345678",
+      password: "master12345678",
     });
     masterToken = master.body.token;
 
     let admin = await request(app).post("/api/signin").send({
       email: "superman@gmail.com",
-      user_password: "clark12345678",
+      password: "clark12345678",
     });
     adminToken = admin.body.token;
 
     let client = await request(app).post("/api/signin").send({
       email: "alice@gmail.com",
-      user_password: "alice12345678",
+      password: "alice12345678",
     });
     clientToken = client.body.token;
 
-    // Création d'un produit pour le test
-    const product = await Product.create({
-      name: "Test Product",
-      description: "A product for testing",
-      price: 9.99,
-      category: CATEGORY.DRINK,
-    });
-    productId = product.id;
+    productId = products[0].id;
   });
 
   it("should allow an admin to update a product", async () => {
@@ -83,14 +89,5 @@ describe("PUT /api/products/update/:id - Update Product", () => {
       .send(updatedProduct);
 
     expect(response.status).toBe(404);
-  });
-
-  // Ajoutez d'autres tests selon les besoins pour la validation des entrées, etc.
-
-  afterAll(async () => {
-    // Nettoyage : supprimez le produit créé pour le test
-    if (productId) {
-      await Product.destroy({ where: { id: productId } });
-    }
   });
 });

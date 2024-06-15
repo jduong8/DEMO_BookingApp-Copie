@@ -1,18 +1,11 @@
-const { DataTypes } = require("sequelize");
 const CATEGORY = require("./category.model.js");
 
-module.exports = (sequelize) => {
+module.exports = (sequelize, DataTypes) => {
   const Product = sequelize.define(
     "Product",
     {
       category: {
-        type: DataTypes.ENUM,
-        values: [
-          CATEGORY.STARTER,
-          CATEGORY.DISH,
-          CATEGORY.DESSERT,
-          CATEGORY.DRINK,
-        ],
+        type: DataTypes.ENUM(...Object.values(CATEGORY)),
         allowNull: false,
       },
       name: {
@@ -30,6 +23,14 @@ module.exports = (sequelize) => {
     },
     {},
   );
+
+  Product.associate = (models) => {
+    Product.belongsTo(models.Order, {
+      onDelete: "CASCADE",
+      foreignKey: "orderId",
+      as: "productId",
+    });
+  };
 
   return Product;
 };

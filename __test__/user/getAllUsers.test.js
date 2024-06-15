@@ -1,15 +1,25 @@
 const request = require("supertest");
 const app = require("../../app.js");
 const USER_ROLE = require("../../models/userRole.model.js");
+const db = require("../../db.js");
+const {
+  createClientMock,
+  createAdminMock,
+} = require("../../mocks/users.mock.js");
 
-describe("GET /api/users - Get All Users", () => {
+describe("User: GET - All Users", () => {
   let masterToken, adminToken, clientToken;
 
   beforeAll(async () => {
-    // Authentification du MASTER
+    const clientsMock = await createClientMock();
+    const adminsMock = await createAdminMock();
+    await db.sequelize.sync({ force: true });
+    await db.User.bulkCreate(clientsMock);
+    await db.User.bulkCreate(adminsMock);
+
     let res = await request(app).post("/api/signin").send({
       email: "master@gmail.com",
-      user_password: "master12345678",
+      password: "master12345678",
     });
     expect(res.body).toHaveProperty("token");
     masterToken = res.body.token;
@@ -17,7 +27,7 @@ describe("GET /api/users - Get All Users", () => {
     // Authentification d'un ADMIN
     res = await request(app).post("/api/signin").send({
       email: "superman@gmail.com",
-      user_password: "clark12345678",
+      password: "clark12345678",
     });
     expect(res.body).toHaveProperty("token");
     adminToken = res.body.token;
@@ -25,7 +35,7 @@ describe("GET /api/users - Get All Users", () => {
     // Authentification d'un CLIENT
     res = await request(app).post("/api/signin").send({
       email: "alice@gmail.com",
-      user_password: "alice12345678",
+      password: "alice12345678",
     });
     expect(res.body).toHaveProperty("token");
     clientToken = res.body.token;
@@ -40,12 +50,8 @@ describe("GET /api/users - Get All Users", () => {
     expect(res.body.some((user) => user.email === "master@gmail.com")).toBe(
       false,
     );
-    expect(res.body.some((user) => user.user_role === USER_ROLE.ADMIN)).toBe(
-      true,
-    );
-    expect(res.body.some((user) => user.user_role === USER_ROLE.CLIENT)).toBe(
-      true,
-    );
+    expect(res.body.some((user) => user.role === USER_ROLE.ADMIN)).toBe(true);
+    expect(res.body.some((user) => user.role === USER_ROLE.CLIENT)).toBe(true);
   });
 
   it("ADMIN should retrieve only CLIENT users", async () => {
@@ -54,18 +60,15 @@ describe("GET /api/users - Get All Users", () => {
       .set("Authorization", adminToken)
       .expect(200);
 
-    expect(res.body.every((user) => user.user_role === USER_ROLE.CLIENT)).toBe(
-      true,
-    );
+    expect(res.body.every((user) => user.role === USER_ROLE.CLIENT)).toBe(true);
   });
 
   it("CLIENT should not be able to retrieve any users", async () => {
-    await request(app)
+    const response = await request(app)
       .get("/api/users/all")
       .set("Authorization", clientToken)
-      .expect(403)
-      .expect((response) => {
-        expect(response.body.message).toEqual("Access denied");
-      });
+      .expect(403);
+
+    expect(response.body.error).toEqual("Access denied");
   });
 });

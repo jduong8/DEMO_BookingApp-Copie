@@ -12,7 +12,7 @@ router.post(
   "/signup",
   signUpValidationRules(),
   validate,
-  authController.createAccount,
+  authController.signUp,
 );
 
 // Get Token from POST request

@@ -1,30 +1,38 @@
 const request = require("supertest");
 const app = require("../../app.js");
 const USER_ROLE = require("../../models/userRole.model.js");
+const db = require("../../db.js");
+const {
+  createClientMock,
+  createAdminMock,
+} = require("../../mocks/users.mock.js");
 
-describe("GET /api/user/info - Get User Information", () => {
+describe("User: GET - User Informations", () => {
   let masterToken, adminToken, clientToken;
 
   beforeAll(async () => {
+    const clientsMock = await createClientMock();
+    const adminsMock = await createAdminMock();
+    await db.sequelize.sync({ force: true });
+    await db.User.bulkCreate(clientsMock);
+    await db.User.bulkCreate(adminsMock);
+
     let res = await request(app).post("/api/signin").send({
       email: "master@gmail.com",
-      user_password: "master12345678",
+      password: "master12345678",
     });
-    expect(res.body).toHaveProperty("token");
     masterToken = res.body.token;
 
     res = await request(app).post("/api/signin").send({
       email: "superman@gmail.com",
-      user_password: "clark12345678",
+      password: "clark12345678",
     });
-    expect(res.body).toHaveProperty("token");
     adminToken = res.body.token;
 
     res = await request(app).post("/api/signin").send({
       email: "alice@gmail.com",
-      user_password: "alice12345678",
+      password: "alice12345678",
     });
-    expect(res.body).toHaveProperty("token");
     clientToken = res.body.token;
   });
 
@@ -35,8 +43,8 @@ describe("GET /api/user/info - Get User Information", () => {
       .expect(200);
 
     expect(res.body.email).toEqual("master@gmail.com");
-    expect(res.body.user_role).toEqual(USER_ROLE.MASTER);
-    expect(res.body.user_password).toBeUndefined();
+    expect(res.body.role).toEqual(USER_ROLE.MASTER);
+    expect(res.body.password).toBeUndefined();
   });
 
   it("should return the ADMIN user's information correctly", async () => {
@@ -46,8 +54,8 @@ describe("GET /api/user/info - Get User Information", () => {
       .expect(200);
 
     expect(res.body.email).toEqual("superman@gmail.com");
-    expect(res.body.user_role).toEqual(USER_ROLE.ADMIN);
-    expect(res.body.user_password).toBeUndefined();
+    expect(res.body.role).toEqual(USER_ROLE.ADMIN);
+    expect(res.body.password).toBeUndefined();
   });
 
   it("should return the CLIENT user's information correctly", async () => {
@@ -57,7 +65,7 @@ describe("GET /api/user/info - Get User Information", () => {
       .expect(200);
 
     expect(res.body.email).toEqual("alice@gmail.com");
-    expect(res.body.user_role).toEqual(USER_ROLE.CLIENT);
-    expect(res.body.user_password).toBeUndefined();
+    expect(res.body.role).toEqual(USER_ROLE.CLIENT);
+    expect(res.body.password).toBeUndefined();
   });
 });

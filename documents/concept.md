@@ -46,22 +46,18 @@ exports.getAllReservations = async (req, res, next) => {
   try {
     let reservations;
     const queryOptions =
-      req.user.user_role === USER_ROLE.CLIENT
+      req.user.role === USER_ROLE.CLIENT
         ? { where: { userId: req.user.id } }
         : {};
 
     reservations = await Reservation.findAll(queryOptions);
 
-    // Formattage de reservation_date et reservation_time pour chaque réservation
+    // Formattage de date et time pour chaque réservation
     const formattedReservations = reservations.map((reservation) => {
       const reservationData = reservation.toJSON();
 
-      reservationData.reservation_date = formatter.formatDate(
-        reservationData.reservation_date,
-      );
-      reservationData.reservation_time = formatter.formatTime(
-        reservationData.reservation_time,
-      );
+      reservationData.date = formatter.formatDate(reservationData.date);
+      reservationData.time = formatter.formatTime(reservationData.time);
 
       return reservationData;
     });

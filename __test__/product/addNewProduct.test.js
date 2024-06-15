@@ -1,31 +1,42 @@
 const request = require("supertest");
 const app = require("../../app.js");
 const CATEGORY = require("../../models/category.model.js");
+const db = require("../../db.js");
+const {
+  createClientMock,
+  createAdminMock,
+} = require("../../mocks/users.mock.js");
 
-describe("POST /products/create - Add New Product", () => {
+describe("Product: POST - Add New Product", () => {
   let masterToken, adminToken, clientToken;
 
   beforeAll(async () => {
+    const clientsMock = await createClientMock();
+    const adminsMock = await createAdminMock();
+    await db.sequelize.sync({ force: true });
+    await db.User.bulkCreate(clientsMock);
+    await db.User.bulkCreate(adminsMock);
+
     let master = await request(app).post("/api/signin").send({
       email: "master@gmail.com",
-      user_password: "master12345678",
+      password: "master12345678",
     });
     masterToken = master.body.token;
 
     let admin = await request(app).post("/api/signin").send({
       email: "superman@gmail.com",
-      user_password: "clark12345678",
+      password: "clark12345678",
     });
     adminToken = admin.body.token;
 
     let client = await request(app).post("/api/signin").send({
       email: "alice@gmail.com",
-      user_password: "alice12345678",
+      password: "alice12345678",
     });
     clientToken = client.body.token;
   });
 
-  it("should allow an admin to create a product", async () => {
+  it("should allow Admin to create a product", async () => {
     const newProduct = {
       name: "Admin Product",
       description: "Admin Description",
@@ -36,6 +47,22 @@ describe("POST /products/create - Add New Product", () => {
     const response = await request(app)
       .post("/api/products/create")
       .set("Authorization", `${adminToken}`)
+      .send(newProduct);
+
+    expect(response.status).toBe(201);
+  });
+
+  it("should allow Master to create a product", async () => {
+    const newProduct = {
+      name: "Master Product",
+      description: "Master Description",
+      price: 20.0,
+      category: CATEGORY.DISH,
+    };
+
+    const response = await request(app)
+      .post("/api/products/create")
+      .set("Authorization", `${masterToken}`)
       .send(newProduct);
 
     expect(response.status).toBe(201);

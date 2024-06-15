@@ -1,16 +1,13 @@
 const request = require("supertest");
 const app = require("../../app.js");
 const db = require("../../db.js");
-const User = db.user;
+const { createClientMock } = require("../../mocks/users.mock.js");
 
-describe("POST /api/users", () => {
-  afterEach(async () => {
-    const user = await User.findOne({
-      where: { email: "testuser@gmail.com" },
-    });
-    if (user) {
-      await user.destroy();
-    }
+describe("Authentication: POST - Create new account", () => {
+  beforeAll(async () => {
+    const clients = await createClientMock();
+    await db.sequelize.sync({ force: true });
+    await db.User.bulkCreate(clients);
   });
 
   it("should create a new user and return user data without password", async () => {
@@ -19,7 +16,7 @@ describe("POST /api/users", () => {
       lastname: "Test",
       email: "testuser@gmail.com",
       phone: "0623456789",
-      user_password: "Test1234",
+      password: "Test1234",
     };
 
     const res = await request(app)
@@ -34,8 +31,8 @@ describe("POST /api/users", () => {
     expect(res.body.user.firstname).toBe(userData.firstname);
     expect(res.body.user.lastname).toBe(userData.lastname);
     expect(res.body.user.phone).toBe(userData.phone);
-    expect(res.body.user.user_role).toBe("Client");
-    expect(res.body.user.user_password).not.toBeDefined();
+    expect(res.body.user.role).toBe("Client");
+    expect(res.body.user.password).not.toBeDefined();
   });
 
   it("should reject an invalid email", async () => {
@@ -43,8 +40,8 @@ describe("POST /api/users", () => {
       firstname: "John",
       lastname: "Test",
       email: "invalid-email",
-      phone: "0623456789",
-      user_password: "Test1234",
+      phone: "0612345678",
+      password: "Test1234",
     };
 
     await request(app)
@@ -55,12 +52,11 @@ describe("POST /api/users", () => {
   });
 
   it("should require all fields to be filled", async () => {
-    // Test with a missing field (missing email)
     const userData = {
       firstname: "John",
       lastname: "Test",
-      phone: "0623456789",
-      user_password: "Test1234",
+      phone: "0612345678",
+      password: "Test1234",
     };
 
     await request(app)
@@ -75,8 +71,24 @@ describe("POST /api/users", () => {
       firstname: 12345,
       lastname: "Test",
       email: "testuser@gmail.com",
-      phone: "0623456789",
-      user_password: "Test1234",
+      phone: "0612345678",
+      password: "Test1234",
+    };
+
+    await request(app)
+      .post("/api/signup")
+      .send(userData)
+      .expect("Content-Type", /json/)
+      .expect(422);
+  });
+
+  it("should return an error when email is already used", async () => {
+    const userData = {
+      firstname: "Alice",
+      lastname: "Test",
+      email: "alice@gmail.com",
+      phone: "0612345678",
+      password: "Test1234",
     };
 
     await request(app)

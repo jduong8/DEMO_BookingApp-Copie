@@ -8,6 +8,7 @@ const morganMiddleware = require("./middlewares/morgan.middleware");
 const logger = require("./utils/logger");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger-output.json");
+require("dotenv").config();
 
 var app = express();
 corsOptions = {

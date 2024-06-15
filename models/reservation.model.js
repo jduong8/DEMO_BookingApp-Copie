@@ -1,7 +1,6 @@
-const { DataTypes } = require("sequelize");
 const RESERVATION_STATUS = require("./reservationStatus.model.js");
 
-module.exports = (sequelize) => {
+module.exports = (sequelize, DataTypes) => {
   const Reservation = sequelize.define(
     "Reservation",
     {
@@ -9,33 +8,40 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      reservation_date: {
+      date: {
         type: DataTypes.DATEONLY,
         allowNull: false,
       },
-      reservation_time: {
+      time: {
         type: DataTypes.TIME,
         allowNull: false,
       },
-      reservation_name: {
+      name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      reservation_note: {
+      description: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      reservation_status: {
-        type: DataTypes.ENUM,
-        values: [
-          RESERVATION_STATUS.PENDING,
-          RESERVATION_STATUS.CONFIRMED,
-          RESERVATION_STATUS.CANCELLATION_REQUESTED,
-        ],
+      status: {
+        type: DataTypes.ENUM(...Object.values(RESERVATION_STATUS)),
         allowNull: false,
       },
     },
     {},
   );
+
+  Reservation.associate = (models) => {
+    Reservation.belongsTo(models.User, {
+      foreignKey: "userId",
+      as: "user",
+    });
+    Reservation.belongsTo(models.Table, {
+      foreignKey: "tableId",
+      as: "table",
+    });
+  };
+
   return Reservation;
 };
